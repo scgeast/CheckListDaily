@@ -1005,7 +1005,7 @@
 
 <script>
     // ============================================================
-    // DATA DEFINITION – MORNING & EVENING
+    // DATA DEFINITION
     // ============================================================
     const plantNames = [
         "Denpasar 2",
@@ -1152,14 +1152,23 @@
     });
 
     // ============================================================
-    // DATE CHANGE - AUTO LOAD
+    // DATE FUNCTIONS
     // ============================================================
+    function getCurrentDate() {
+        const dateInput = document.getElementById("filterDate");
+        if (!dateInput.value) {
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.value = today;
+        }
+        return dateInput.value;
+    }
+
     function onDateChange() {
         if (isLoading) return;
         const date = getCurrentDate();
         if (!date) return;
         
-        const storageKey = `eastBU_${date}`;
+        const storageKey = 'eastBU_' + date;
         const hasData = isStorageAvailable && localStorage.getItem(storageKey) !== null;
         
         updateStatusIndicator(date, hasData);
@@ -1175,7 +1184,7 @@
             const text = document.getElementById("notificationText");
             const badge = document.getElementById("notificationBadge");
             banner.className = "notification-banner show warning";
-            text.innerHTML = `📅 Tanggal <strong>${date}</strong> - Belum ada data. Silakan isi data baru.`;
+            text.innerHTML = '📅 Tanggal <strong>' + date + '</strong> - Belum ada data. Silakan isi data baru.';
             badge.textContent = "📝 NEW";
             badge.className = "badge-count";
         }
@@ -1185,10 +1194,10 @@
         const indicator = document.getElementById("statusIndicator");
         if (hasData) {
             indicator.className = "status-indicator has-data";
-            indicator.textContent = `✅ ${date} - Ada data`;
+            indicator.textContent = '✅ ' + date + ' - Ada data';
         } else {
             indicator.className = "status-indicator no-data";
-            indicator.textContent = `📅 ${date} - Kosong`;
+            indicator.textContent = '📅 ' + date + ' - Kosong';
         }
     }
 
@@ -1197,7 +1206,7 @@
     // ============================================================
     function calculateTotalMorning() {
         let sum = 0, count = 0;
-        plantNames.forEach(name => {
+        plantNames.forEach(function(name) {
             const d = plantDataMorning[name];
             if (d && d.orderVolume && d.orderVolume.trim() !== "") {
                 const val = parseFloat(d.orderVolume.replace(/,/g, '')) || 0;
@@ -1206,12 +1215,12 @@
             }
         });
         totalOrderMorning = sum;
-        return { sum, count };
+        return { sum: sum, count: count };
     }
 
     function calculateTotalEvening() {
         let sum = 0, count = 0;
-        plantNames.forEach(name => {
+        plantNames.forEach(function(name) {
             const d = plantDataEvening[name];
             if (d && d.volumeTomorrow && d.volumeTomorrow.trim() !== "") {
                 const val = parseFloat(d.volumeTomorrow.replace(/,/g, '')) || 0;
@@ -1220,37 +1229,37 @@
             }
         });
         totalOrderEvening = sum;
-        return { sum, count };
+        return { sum: sum, count: count };
     }
 
     function updateTotalDisplays() {
-        const { sum: sumM, count: countM } = calculateTotalMorning();
-        const displayM = document.getElementById('totalOrderDisplayMorning');
-        const countMEl = document.getElementById('plantCountMorning');
-        if (displayM) { displayM.textContent = sumM.toLocaleString('id-ID'); displayM.classList.remove('pop'); void displayM.offsetWidth; displayM.classList.add('pop'); }
-        if (countMEl) countMEl.textContent = `${countM} Plant`;
+        var resultM = calculateTotalMorning();
+        var displayM = document.getElementById('totalOrderDisplayMorning');
+        var countMEl = document.getElementById('plantCountMorning');
+        if (displayM) { displayM.textContent = resultM.sum.toLocaleString('id-ID'); displayM.classList.remove('pop'); void displayM.offsetWidth; displayM.classList.add('pop'); }
+        if (countMEl) countMEl.textContent = resultM.count + ' Plant';
 
-        const { sum: sumE, count: countE } = calculateTotalEvening();
-        const displayE = document.getElementById('totalOrderDisplayEvening');
-        const countEEl = document.getElementById('plantCountEvening');
-        if (displayE) { displayE.textContent = sumE.toLocaleString('id-ID'); displayE.classList.remove('pop'); void displayE.offsetWidth; displayE.classList.add('pop'); }
-        if (countEEl) countEEl.textContent = `${countE} Plant`;
+        var resultE = calculateTotalEvening();
+        var displayE = document.getElementById('totalOrderDisplayEvening');
+        var countEEl = document.getElementById('plantCountEvening');
+        if (displayE) { displayE.textContent = resultE.sum.toLocaleString('id-ID'); displayE.classList.remove('pop'); void displayE.offsetWidth; displayE.classList.add('pop'); }
+        if (countEEl) countEEl.textContent = resultE.count + ' Plant';
     }
 
     // ============================================================
-    // CHECK COMPLETENESS
+    // COMPLETENESS
     // ============================================================
     function getCompleteness() {
-        let totalIssues = 0;
-        let incompletePlants = [];
-        let missingFields = {};
+        var totalIssues = 0;
+        var incompletePlants = [];
+        var missingFields = {};
 
-        plantNames.forEach(name => {
-            const d = plantDataMorning[name];
-            let issues = [];
+        plantNames.forEach(function(name) {
+            var d = plantDataMorning[name];
+            var issues = [];
             if (!d.orderVolume || d.orderVolume.trim() === "") issues.push("Order Volume Today");
-            morningCheckboxFields.forEach(f => {
-                if (d[f.key] === null) issues.push(`${f.label} (belum dipilih)`);
+            morningCheckboxFields.forEach(function(f) {
+                if (d[f.key] === null) issues.push(f.label + ' (belum dipilih)');
             });
             if (d.tmActual === false) {
                 if (!d.actualTm || d.actualTm.trim() === "") issues.push("Actual TM");
@@ -1259,68 +1268,68 @@
             if (d.sudahLoading === false) {
                 if (!d.keteranganLoading || d.keteranganLoading.trim() === "") issues.push("Keterangan Loading");
             }
-            morningCheckboxFields.forEach(f => {
-                const key = f.key;
+            morningCheckboxFields.forEach(function(f) {
+                var key = f.key;
                 if ((f.triggerOn === 'x' && d[key] === false) || (f.triggerOn === 'ok' && d[key] === true)) {
-                    if (!d[`kendala_${key}`] || d[`kendala_${key}`].trim() === "") issues.push(`Kendala ${f.label}`);
-                    if (!d[`action_${key}`] || d[`action_${key}`].trim() === "") issues.push(`Action ${f.label}`);
+                    if (!d['kendala_' + key] || d['kendala_' + key].trim() === "") issues.push('Kendala ' + f.label);
+                    if (!d['action_' + key] || d['action_' + key].trim() === "") issues.push('Action ' + f.label);
                 }
             });
-            if (issues.length > 0) { incompletePlants.push(name + " (M)"); missingFields[name + " (M)"] = issues; totalIssues += issues.length; }
+            if (issues.length > 0) { incompletePlants.push(name + ' (M)'); missingFields[name + ' (M)'] = issues; totalIssues += issues.length; }
         });
 
-        plantNames.forEach(name => {
-            const d = plantDataEvening[name];
-            let issues = [];
+        plantNames.forEach(function(name) {
+            var d = plantDataEvening[name];
+            var issues = [];
             if (!d.volumeTomorrow || d.volumeTomorrow.trim() === "") issues.push("Volume Tomorrow");
             if (!d.tmReqPpc || d.tmReqPpc.trim() === "") issues.push("TM Req PPC (belum diisi)");
             
-            eveningCheckboxFields.forEach(f => {
-                if (d[f.key] === null) issues.push(`${f.label} (belum dipilih)`);
+            eveningCheckboxFields.forEach(function(f) {
+                if (d[f.key] === null) issues.push(f.label + ' (belum dipilih)');
             });
-            eveningCheckboxFields.forEach(f => {
-                const key = f.key;
+            eveningCheckboxFields.forEach(function(f) {
+                var key = f.key;
                 if ((f.triggerOn === 'x' && d[key] === false) || (f.triggerOn === 'ok' && d[key] === true)) {
-                    if (!d[`kendala_${key}`] || d[`kendala_${key}`].trim() === "") issues.push(`Kendala ${f.label}`);
-                    if (!d[`action_${key}`] || d[`action_${key}`].trim() === "") issues.push(`Action ${f.label}`);
+                    if (!d['kendala_' + key] || d['kendala_' + key].trim() === "") issues.push('Kendala ' + f.label);
+                    if (!d['action_' + key] || d['action_' + key].trim() === "") issues.push('Action ' + f.label);
                 }
             });
-            if (issues.length > 0) { incompletePlants.push(name + " (E)"); missingFields[name + " (E)"] = issues; totalIssues += issues.length; }
+            if (issues.length > 0) { incompletePlants.push(name + ' (E)'); missingFields[name + ' (E)'] = issues; totalIssues += issues.length; }
         });
 
-        return { totalIssues, incompletePlants, missingFields };
+        return { totalIssues: totalIssues, incompletePlants: incompletePlants, missingFields: missingFields };
     }
 
     function updateNotification() {
-        const banner = document.getElementById("notificationBanner");
-        const text = document.getElementById("notificationText");
-        const badge = document.getElementById("notificationBadge");
-        const { totalIssues, incompletePlants, missingFields } = getCompleteness();
+        var banner = document.getElementById("notificationBanner");
+        var text = document.getElementById("notificationText");
+        var badge = document.getElementById("notificationBadge");
+        var result = getCompleteness();
 
-        if (totalIssues === 0) {
+        if (result.totalIssues === 0) {
             banner.className = "notification-banner show success";
             text.innerHTML = "🎉 Semua data lengkap! Morning & Evening sudah terisi.";
             badge.textContent = "✓ COMPLETE";
             badge.className = "badge-count green";
         } else {
             banner.className = "notification-banner show warning";
-            let detailText = `⚠️ ${totalIssues} data belum lengkap pada ${incompletePlants.length} area: `;
-            detailText += incompletePlants.join(", ");
+            var detailText = '⚠️ ' + result.totalIssues + ' data belum lengkap pada ' + result.incompletePlants.length + ' area: ';
+            detailText += result.incompletePlants.join(", ");
             text.innerHTML = detailText;
-            badge.textContent = `${totalIssues} ISSUES`;
+            badge.textContent = result.totalIssues + ' ISSUES';
             badge.className = "badge-count";
         }
     }
 
     function checkCompleteness() {
-        const { totalIssues, incompletePlants, missingFields } = getCompleteness();
-        if (totalIssues === 0) {
+        var result = getCompleteness();
+        if (result.totalIssues === 0) {
             alert("🎉 SEMUA DATA LENGKAP! Morning & Evening sudah terisi.");
         } else {
-            let msg = `⚠️ DATA BELUM LENGKAP!\nTotal issue: ${totalIssues}\nArea bermasalah: ${incompletePlants.length}\n\n`;
-            Object.keys(missingFields).forEach(name => {
-                msg += `📌 ${name}:\n`;
-                missingFields[name].forEach(issue => { msg += `   - ${issue}\n`; });
+            var msg = '⚠️ DATA BELUM LENGKAP!\nTotal issue: ' + result.totalIssues + '\nArea bermasalah: ' + result.incompletePlants.length + '\n\n';
+            Object.keys(result.missingFields).forEach(function(name) {
+                msg += '📌 ' + name + ':\n';
+                result.missingFields[name].forEach(function(issue) { msg += '   - ' + issue + '\n'; });
                 msg += "\n";
             });
             alert(msg);
@@ -1331,11 +1340,11 @@
     // RENDER MORNING
     // ============================================================
     function isPlantCompleteMorning(name) {
-        const d = plantDataMorning[name];
+        var d = plantDataMorning[name];
         if (!d) return false;
         if (!d.orderVolume || d.orderVolume.trim() === "") return false;
-        for (let f of morningCheckboxFields) {
-            if (d[f.key] === null) return false;
+        for (var i = 0; i < morningCheckboxFields.length; i++) {
+            if (d[morningCheckboxFields[i].key] === null) return false;
         }
         if (d.tmActual === false) {
             if (!d.actualTm || d.actualTm.trim() === "") return false;
@@ -1344,11 +1353,12 @@
         if (d.sudahLoading === false) {
             if (!d.keteranganLoading || d.keteranganLoading.trim() === "") return false;
         }
-        for (let f of morningCheckboxFields) {
-            const key = f.key;
+        for (var j = 0; j < morningCheckboxFields.length; j++) {
+            var f = morningCheckboxFields[j];
+            var key = f.key;
             if ((f.triggerOn === 'x' && d[key] === false) || (f.triggerOn === 'ok' && d[key] === true)) {
-                if (!d[`kendala_${key}`] || d[`kendala_${key}`].trim() === "") return false;
-                if (!d[`action_${key}`] || d[`action_${key}`].trim() === "") return false;
+                if (!d['kendala_' + key] || d['kendala_' + key].trim() === "") return false;
+                if (!d['action_' + key] || d['action_' + key].trim() === "") return false;
             }
         }
         return true;
@@ -1357,16 +1367,16 @@
     function renderMorning() {
         if (isRendering) return;
         isRendering = true;
-        const container = document.getElementById("plantContainerMorning");
-        let html = "";
-        plantNames.forEach((name, idx) => {
-            const d = plantDataMorning[name];
-            const complete = isPlantCompleteMorning(name);
-            const cardClass = complete ? 'complete' : 'incomplete';
+        var container = document.getElementById("plantContainerMorning");
+        var html = "";
+        plantNames.forEach(function(name, idx) {
+            var d = plantDataMorning[name];
+            var complete = isPlantCompleteMorning(name);
+            var cardClass = complete ? 'complete' : 'incomplete';
 
-            let filled = 0;
+            var filled = 0;
             if (d.orderVolume && d.orderVolume.trim() !== "") filled++;
-            morningCheckboxFields.forEach(f => { if (d[f.key] !== null) filled++; });
+            morningCheckboxFields.forEach(function(f) { if (d[f.key] !== null) filled++; });
             if (d.tmActual === false) {
                 if (d.actualTm && d.actualTm.trim() !== "") filled++;
                 if (d.reqPpc && d.reqPpc.trim() !== "") filled++;
@@ -1374,88 +1384,62 @@
             if (d.sudahLoading === false) {
                 if (d.keteranganLoading && d.keteranganLoading.trim() !== "") filled++;
             }
-            for (let f of morningCheckboxFields) {
-                const key = f.key;
+            for (var i = 0; i < morningCheckboxFields.length; i++) {
+                var f = morningCheckboxFields[i];
+                var key = f.key;
                 if ((f.triggerOn === 'x' && d[key] === false) || (f.triggerOn === 'ok' && d[key] === true)) {
-                    if (d[`kendala_${key}`] && d[`kendala_${key}`].trim() !== "") filled++;
-                    if (d[`action_${key}`] && d[`action_${key}`].trim() !== "") filled++;
+                    if (d['kendala_' + key] && d['kendala_' + key].trim() !== "") filled++;
+                    if (d['action_' + key] && d['action_' + key].trim() !== "") filled++;
                 }
             }
-            const totalFields = 1 + morningCheckboxFields.length + 2 + 2 + (morningCheckboxFields.length * 2);
-            let statusClass = "empty", statusText = "Kosong";
-            const pct = (filled / totalFields) * 100;
+            var totalFields = 1 + morningCheckboxFields.length + 2 + 2 + (morningCheckboxFields.length * 2);
+            var statusClass = "empty", statusText = "Kosong";
+            var pct = (filled / totalFields) * 100;
             if (pct >= 90) { statusClass = "complete"; statusText = "✓ Lengkap"; }
             else if (pct >= 30) { statusClass = "partial"; statusText = "⏳ Sebagian"; }
 
-            html += `
-                <div class="plant-card ${cardClass}" data-plant="${name}" id="card-morning-${idx}">
-                    <div class="plant-header">
-                        <h2><span class="color-dot"></span>${idx+1}. Plant ${name} ${complete ? ' ✅' : ' ⏳'}</h2>
-                        <span class="plant-status ${statusClass}">${statusText} (${Math.round(pct)}%)</span>
-                    </div>
-                    <div class="row">
-                        <div class="field">
-                            <label>Order Volume Today</label>
-                            <input type="number" value="${d.orderVolume || ''}" placeholder="0" 
-                                oninput="updateMorningField('${name}', 'orderVolume', this.value)" min="0" step="1" />
-                        </div>
-            `;
-            morningCheckboxFields.forEach(f => {
-                const key = f.key;
-                const isOk = d[key] === true;
-                const isX = d[key] === false;
-                const checkedOk = isOk ? 'checked' : '';
-                const checkedX = isX ? 'checked' : '';
-                const showConstraint = (f.triggerOn === 'x' && isX) || (f.triggerOn === 'ok' && isOk);
-                const isTm = (key === 'tmActual');
-                const isLoading = (key === 'sudahLoading');
-                let labelOk = "OK", labelX = "X";
+            html += '<div class="plant-card ' + cardClass + '" data-plant="' + name + '" id="card-morning-' + idx + '">';
+            html += '<div class="plant-header">';
+            html += '<h2><span class="color-dot"></span>' + (idx+1) + '. Plant ' + name + (complete ? ' ✅' : ' ⏳') + '</h2>';
+            html += '<span class="plant-status ' + statusClass + '">' + statusText + ' (' + Math.round(pct) + '%)</span>';
+            html += '</div><div class="row">';
+            html += '<div class="field"><label>Order Volume Today</label><input type="number" value="' + (d.orderVolume || '') + '" placeholder="0" oninput="updateMorningField(\'' + name + '\', \'orderVolume\', this.value)" min="0" step="1" /></div>';
+            
+            morningCheckboxFields.forEach(function(f) {
+                var key = f.key;
+                var isOk = d[key] === true;
+                var isX = d[key] === false;
+                var checkedOk = isOk ? 'checked' : '';
+                var checkedX = isX ? 'checked' : '';
+                var showConstraint = (f.triggerOn === 'x' && isX) || (f.triggerOn === 'ok' && isOk);
+                var isTm = (key === 'tmActual');
+                var isLoading = (key === 'sudahLoading');
+                var labelOk = "OK", labelX = "X";
                 if (isTm) { labelOk = "Sesuai"; labelX = "Tidak Sesuai"; }
                 else if (isLoading) { labelOk = "Sudah Loading"; labelX = "Belum Loading"; }
                 else if (f.triggerOn === 'ok') { labelOk = "Ada"; labelX = "Tidak Ada"; }
                 else { labelOk = "Aman"; labelX = "Tidak Aman"; }
 
-                html += `
-                    <div class="field" style="grid-column:1/-1;${isLoading?'border-top:2px dashed #dce3ed;padding-top:12px;margin-top:8px;':''}">
-                        <label>${f.label}</label>
-                        <div class="checkbox-group">
-                            <label class="checkbox-ok">
-                                <input type="checkbox" ${checkedOk} onchange="toggleMorningCheckbox('${name}','${key}',true)" /> 
-                                <span class="checkbox-label-icon">✅</span> ${labelOk}
-                            </label>
-                            <label class="checkbox-x">
-                                <input type="checkbox" ${checkedX} onchange="toggleMorningCheckbox('${name}','${key}',false)" /> 
-                                <span class="checkbox-label-icon">❌</span> ${labelX}
-                            </label>
-                        </div>
-                    </div>
-                `;
+                html += '<div class="field" style="grid-column:1/-1;' + (isLoading ? 'border-top:2px dashed #dce3ed;padding-top:12px;margin-top:8px;' : '') + '">';
+                html += '<label>' + f.label + '</label><div class="checkbox-group">';
+                html += '<label class="checkbox-ok"><input type="checkbox" ' + checkedOk + ' onchange="toggleMorningCheckbox(\'' + name + '\',\'' + key + '\',true)" /> <span class="checkbox-label-icon">✅</span> ' + labelOk + '</label>';
+                html += '<label class="checkbox-x"><input type="checkbox" ' + checkedX + ' onchange="toggleMorningCheckbox(\'' + name + '\',\'' + key + '\',false)" /> <span class="checkbox-label-icon">❌</span> ' + labelX + '</label>';
+                html += '</div></div>';
+                
                 if (isTm && isX) {
-                    html += `
-                        <div class="sub-fields show">
-                            <div class="sub-field-row"><label>📊 Actual TM:</label><input type="number" value="${d.actualTm||''}" placeholder="Actual TM" oninput="updateMorningField('${name}','actualTm',this.value)" min="0" step="1" /></div>
-                            <div class="sub-field-row"><label>📋 Req PPC:</label><input type="number" value="${d.reqPpc||''}" placeholder="Req PPC" oninput="updateMorningField('${name}','reqPpc',this.value)" min="0" step="1" /></div>
-                        </div>
-                    `;
+                    html += '<div class="sub-fields show"><div class="sub-field-row"><label>📊 Actual TM:</label><input type="number" value="' + (d.actualTm||'') + '" placeholder="Actual TM" oninput="updateMorningField(\'' + name + '\',\'actualTm\',this.value)" min="0" step="1" /></div>';
+                    html += '<div class="sub-field-row"><label>📋 Req PPC:</label><input type="number" value="' + (d.reqPpc||'') + '" placeholder="Req PPC" oninput="updateMorningField(\'' + name + '\',\'reqPpc\',this.value)" min="0" step="1" /></div></div>';
                 }
                 if (isLoading && isX) {
-                    html += `
-                        <div class="sub-fields-loading show">
-                            <div class="sub-field-row-loading"><label>📝 Keterangan:</label><input type="text" value="${d.keteranganLoading||''}" placeholder="Keterangan" oninput="updateMorningField('${name}','keteranganLoading',this.value)" /></div>
-                        </div>
-                    `;
+                    html += '<div class="sub-fields-loading show"><div class="sub-field-row-loading"><label>📝 Keterangan:</label><input type="text" value="' + (d.keteranganLoading||'') + '" placeholder="Keterangan" oninput="updateMorningField(\'' + name + '\',\'keteranganLoading\',this.value)" /></div></div>';
                 }
                 if (showConstraint) {
-                    html += `
-                        <div class="constraint-item show">
-                            <div class="constraint-title">⚠️ ${f.label} - Isi kendala & action:</div>
-                            <div class="constraint-row"><label>🚧 Kendala:</label><input type="text" value="${d[`kendala_${key}`]||''}" placeholder="Kendala" oninput="updateMorningField('${name}','kendala_${key}',this.value)" /></div>
-                            <div class="constraint-row"><label>✅ Action:</label><input type="text" value="${d[`action_${key}`]||''}" placeholder="Action" oninput="updateMorningField('${name}','action_${key}',this.value)" /></div>
-                        </div>
-                    `;
+                    html += '<div class="constraint-item show"><div class="constraint-title">⚠️ ' + f.label + ' - Isi kendala & action:</div>';
+                    html += '<div class="constraint-row"><label>🚧 Kendala:</label><input type="text" value="' + (d['kendala_' + key]||'') + '" placeholder="Kendala" oninput="updateMorningField(\'' + name + '\',\'kendala_' + key + '\',this.value)" /></div>';
+                    html += '<div class="constraint-row"><label>✅ Action:</label><input type="text" value="' + (d['action_' + key]||'') + '" placeholder="Action" oninput="updateMorningField(\'' + name + '\',\'action_' + key + '\',this.value)" /></div></div>';
                 }
             });
-            html += `</div></div>`;
+            html += '</div></div>';
         });
         container.innerHTML = html;
         updateTotalDisplays();
@@ -1467,19 +1451,20 @@
     // RENDER EVENING
     // ============================================================
     function isPlantCompleteEvening(name) {
-        const d = plantDataEvening[name];
+        var d = plantDataEvening[name];
         if (!d) return false;
         if (!d.volumeTomorrow || d.volumeTomorrow.trim() === "") return false;
         if (!d.tmReqPpc || d.tmReqPpc.trim() === "") return false;
         
-        for (let f of eveningCheckboxFields) {
-            if (d[f.key] === null) return false;
+        for (var i = 0; i < eveningCheckboxFields.length; i++) {
+            if (d[eveningCheckboxFields[i].key] === null) return false;
         }
-        for (let f of eveningCheckboxFields) {
-            const key = f.key;
+        for (var j = 0; j < eveningCheckboxFields.length; j++) {
+            var f = eveningCheckboxFields[j];
+            var key = f.key;
             if ((f.triggerOn === 'x' && d[key] === false) || (f.triggerOn === 'ok' && d[key] === true)) {
-                if (!d[`kendala_${key}`] || d[`kendala_${key}`].trim() === "") return false;
-                if (!d[`action_${key}`] || d[`action_${key}`].trim() === "") return false;
+                if (!d['kendala_' + key] || d['kendala_' + key].trim() === "") return false;
+                if (!d['action_' + key] || d['action_' + key].trim() === "") return false;
             }
         }
         return true;
@@ -1488,88 +1473,64 @@
     function renderEvening() {
         if (isRendering) return;
         isRendering = true;
-        const container = document.getElementById("plantContainerEvening");
-        let html = "";
-        plantNames.forEach((name, idx) => {
-            const d = plantDataEvening[name];
-            const complete = isPlantCompleteEvening(name);
-            const cardClass = complete ? 'complete' : 'incomplete';
+        var container = document.getElementById("plantContainerEvening");
+        var html = "";
+        plantNames.forEach(function(name, idx) {
+            var d = plantDataEvening[name];
+            var complete = isPlantCompleteEvening(name);
+            var cardClass = complete ? 'complete' : 'incomplete';
 
-            let filled = 0;
+            var filled = 0;
             if (d.volumeTomorrow && d.volumeTomorrow.trim() !== "") filled++;
             if (d.tmReqPpc && d.tmReqPpc.trim() !== "") filled++;
             
-            eveningCheckboxFields.forEach(f => { if (d[f.key] !== null) filled++; });
-            for (let f of eveningCheckboxFields) {
-                const key = f.key;
+            eveningCheckboxFields.forEach(function(f) { if (d[f.key] !== null) filled++; });
+            for (var i = 0; i < eveningCheckboxFields.length; i++) {
+                var f = eveningCheckboxFields[i];
+                var key = f.key;
                 if ((f.triggerOn === 'x' && d[key] === false) || (f.triggerOn === 'ok' && d[key] === true)) {
-                    if (d[`kendala_${key}`] && d[`kendala_${key}`].trim() !== "") filled++;
-                    if (d[`action_${key}`] && d[`action_${key}`].trim() !== "") filled++;
+                    if (d['kendala_' + key] && d['kendala_' + key].trim() !== "") filled++;
+                    if (d['action_' + key] && d['action_' + key].trim() !== "") filled++;
                 }
             }
-            const totalFields = 1 + 1 + eveningCheckboxFields.length + (eveningCheckboxFields.length * 2);
-            let statusClass = "empty", statusText = "Kosong";
-            const pct = (filled / totalFields) * 100;
+            var totalFields = 1 + 1 + eveningCheckboxFields.length + (eveningCheckboxFields.length * 2);
+            var statusClass = "empty", statusText = "Kosong";
+            var pct = (filled / totalFields) * 100;
             if (pct >= 90) { statusClass = "complete"; statusText = "✓ Lengkap"; }
             else if (pct >= 30) { statusClass = "partial"; statusText = "⏳ Sebagian"; }
 
-            html += `
-                <div class="plant-card ${cardClass}" data-plant="${name}" id="card-evening-${idx}">
-                    <div class="plant-header">
-                        <h2><span class="color-dot"></span>${idx+1}. Plant ${name} ${complete ? ' ✅' : ' ⏳'}</h2>
-                        <span class="plant-status ${statusClass}">${statusText} (${Math.round(pct)}%)</span>
-                    </div>
-                    <div class="row">
-                        <div class="field">
-                            <label>Volume Tomorrow</label>
-                            <input type="number" value="${d.volumeTomorrow||''}" placeholder="0" 
-                                oninput="updateEveningField('${name}','volumeTomorrow',this.value)" min="0" step="1" />
-                        </div>
-                        
-                        <div class="tm-req-field">
-                            <label>📊 TM Req PPC</label>
-                            <input type="text" value="${d.tmReqPpc||''}" placeholder="Masukkan TM Req PPC..." 
-                                oninput="updateEveningField('${name}','tmReqPpc',this.value)" />
-                        </div>
-            `;
+            html += '<div class="plant-card ' + cardClass + '" data-plant="' + name + '" id="card-evening-' + idx + '">';
+            html += '<div class="plant-header">';
+            html += '<h2><span class="color-dot"></span>' + (idx+1) + '. Plant ' + name + (complete ? ' ✅' : ' ⏳') + '</h2>';
+            html += '<span class="plant-status ' + statusClass + '">' + statusText + ' (' + Math.round(pct) + '%)</span>';
+            html += '</div><div class="row">';
+            html += '<div class="field"><label>Volume Tomorrow</label><input type="number" value="' + (d.volumeTomorrow||'') + '" placeholder="0" oninput="updateEveningField(\'' + name + '\',\'volumeTomorrow\',this.value)" min="0" step="1" /></div>';
+            html += '<div class="tm-req-field"><label>📊 TM Req PPC</label><input type="text" value="' + (d.tmReqPpc||'') + '" placeholder="Masukkan TM Req PPC..." oninput="updateEveningField(\'' + name + '\',\'tmReqPpc\',this.value)" /></div>';
             
-            eveningCheckboxFields.forEach(f => {
-                const key = f.key;
-                const isOk = d[key] === true;
-                const isX = d[key] === false;
-                const checkedOk = isOk ? 'checked' : '';
-                const checkedX = isX ? 'checked' : '';
-                const showConstraint = (f.triggerOn === 'x' && isX) || (f.triggerOn === 'ok' && isOk);
-                let labelOk = "OK", labelX = "X";
+            eveningCheckboxFields.forEach(function(f) {
+                var key = f.key;
+                var isOk = d[key] === true;
+                var isX = d[key] === false;
+                var checkedOk = isOk ? 'checked' : '';
+                var checkedX = isX ? 'checked' : '';
+                var showConstraint = (f.triggerOn === 'x' && isX) || (f.triggerOn === 'ok' && isOk);
+                var labelOk = "OK", labelX = "X";
                 if (f.triggerOn === 'ok') { labelOk = "Ada"; labelX = "Tidak Ada"; }
                 else { labelOk = "Aman"; labelX = "Tidak Aman"; }
 
-                html += `
-                    <div class="field" style="grid-column:1/-1;">
-                        <label>${f.label}</label>
-                        <div class="checkbox-group">
-                            <label class="checkbox-ok">
-                                <input type="checkbox" ${checkedOk} onchange="toggleEveningCheckbox('${name}','${key}',true)" /> 
-                                <span class="checkbox-label-icon">✅</span> ${labelOk}
-                            </label>
-                            <label class="checkbox-x">
-                                <input type="checkbox" ${checkedX} onchange="toggleEveningCheckbox('${name}','${key}',false)" /> 
-                                <span class="checkbox-label-icon">❌</span> ${labelX}
-                            </label>
-                        </div>
-                    </div>
-                `;
+                html += '<div class="field" style="grid-column:1/-1;">';
+                html += '<label>' + f.label + '</label><div class="checkbox-group">';
+                html += '<label class="checkbox-ok"><input type="checkbox" ' + checkedOk + ' onchange="toggleEveningCheckbox(\'' + name + '\',\'' + key + '\',true)" /> <span class="checkbox-label-icon">✅</span> ' + labelOk + '</label>';
+                html += '<label class="checkbox-x"><input type="checkbox" ' + checkedX + ' onchange="toggleEveningCheckbox(\'' + name + '\',\'' + key + '\',false)" /> <span class="checkbox-label-icon">❌</span> ' + labelX + '</label>';
+                html += '</div></div>';
+                
                 if (showConstraint) {
-                    html += `
-                        <div class="constraint-item show">
-                            <div class="constraint-title">⚠️ ${f.label} - Isi kendala & action:</div>
-                            <div class="constraint-row"><label>🚧 Kendala:</label><input type="text" value="${d[`kendala_${key}`]||''}" placeholder="Kendala" oninput="updateEveningField('${name}','kendala_${key}',this.value)" /></div>
-                            <div class="constraint-row"><label>✅ Action:</label><input type="text" value="${d[`action_${key}`]||''}" placeholder="Action" oninput="updateEveningField('${name}','action_${key}',this.value)" /></div>
-                        </div>
-                    `;
+                    html += '<div class="constraint-item show"><div class="constraint-title">⚠️ ' + f.label + ' - Isi kendala & action:</div>';
+                    html += '<div class="constraint-row"><label>🚧 Kendala:</label><input type="text" value="' + (d['kendala_' + key]||'') + '" placeholder="Kendala" oninput="updateEveningField(\'' + name + '\',\'kendala_' + key + '\',this.value)" /></div>';
+                    html += '<div class="constraint-row"><label>✅ Action:</label><input type="text" value="' + (d['action_' + key]||'') + '" placeholder="Action" oninput="updateEveningField(\'' + name + '\',\'action_' + key + '\',this.value)" /></div></div>';
                 }
             });
-            html += `</div></div>`;
+            html += '</div></div>';
         });
         container.innerHTML = html;
         updateTotalDisplays();
@@ -1590,17 +1551,17 @@
     }
 
     function updateCardStatusMorning(plant) {
-        const complete = isPlantCompleteMorning(plant);
-        const cards = document.querySelectorAll('#plantContainerMorning .plant-card');
-        for (let card of cards) {
-            if (card.dataset.plant === plant) {
-                card.className = `plant-card ${complete ? 'complete' : 'incomplete'}`;
-                const statusEl = card.querySelector('.plant-status');
+        var complete = isPlantCompleteMorning(plant);
+        var cards = document.querySelectorAll('#plantContainerMorning .plant-card');
+        for (var i = 0; i < cards.length; i++) {
+            if (cards[i].dataset.plant === plant) {
+                cards[i].className = 'plant-card ' + (complete ? 'complete' : 'incomplete');
+                var statusEl = cards[i].querySelector('.plant-status');
                 if (statusEl) {
-                    const d = plantDataMorning[plant];
-                    let filled = 0;
+                    var d = plantDataMorning[plant];
+                    var filled = 0;
                     if (d.orderVolume && d.orderVolume.trim() !== "") filled++;
-                    morningCheckboxFields.forEach(f => { if (d[f.key] !== null) filled++; });
+                    morningCheckboxFields.forEach(function(f) { if (d[f.key] !== null) filled++; });
                     if (d.tmActual === false) {
                         if (d.actualTm && d.actualTm.trim() !== "") filled++;
                         if (d.reqPpc && d.reqPpc.trim() !== "") filled++;
@@ -1608,22 +1569,23 @@
                     if (d.sudahLoading === false) {
                         if (d.keteranganLoading && d.keteranganLoading.trim() !== "") filled++;
                     }
-                    for (let f of morningCheckboxFields) {
-                        const key = f.key;
+                    for (var j = 0; j < morningCheckboxFields.length; j++) {
+                        var f = morningCheckboxFields[j];
+                        var key = f.key;
                         if ((f.triggerOn === 'x' && d[key] === false) || (f.triggerOn === 'ok' && d[key] === true)) {
-                            if (d[`kendala_${key}`] && d[`kendala_${key}`].trim() !== "") filled++;
-                            if (d[`action_${key}`] && d[`action_${key}`].trim() !== "") filled++;
+                            if (d['kendala_' + key] && d['kendala_' + key].trim() !== "") filled++;
+                            if (d['action_' + key] && d['action_' + key].trim() !== "") filled++;
                         }
                     }
-                    const totalFields = 1 + morningCheckboxFields.length + 2 + 2 + (morningCheckboxFields.length * 2);
-                    const pct = (filled / totalFields) * 100;
-                    let statusClass = "empty", statusText = "Kosong";
+                    var totalFields = 1 + morningCheckboxFields.length + 2 + 2 + (morningCheckboxFields.length * 2);
+                    var pct = (filled / totalFields) * 100;
+                    var statusClass = "empty", statusText = "Kosong";
                     if (pct >= 90) { statusClass = "complete"; statusText = "✓ Lengkap"; }
                     else if (pct >= 30) { statusClass = "partial"; statusText = "⏳ Sebagian"; }
-                    statusEl.className = `plant-status ${statusClass}`;
-                    statusEl.textContent = `${statusText} (${Math.round(pct)}%)`;
+                    statusEl.className = 'plant-status ' + statusClass;
+                    statusEl.textContent = statusText + ' (' + Math.round(pct) + '%)';
                 }
-                const header = card.querySelector('.plant-header h2');
+                var header = cards[i].querySelector('.plant-header h2');
                 if (header) {
                     header.innerHTML = header.innerHTML.replace(/ ✅| ⏳/, '') + (complete ? ' ✅' : ' ⏳');
                 }
@@ -1662,34 +1624,35 @@
     }
 
     function updateCardStatusEvening(plant) {
-        const complete = isPlantCompleteEvening(plant);
-        const cards = document.querySelectorAll('#plantContainerEvening .plant-card');
-        for (let card of cards) {
-            if (card.dataset.plant === plant) {
-                card.className = `plant-card ${complete ? 'complete' : 'incomplete'}`;
-                const statusEl = card.querySelector('.plant-status');
+        var complete = isPlantCompleteEvening(plant);
+        var cards = document.querySelectorAll('#plantContainerEvening .plant-card');
+        for (var i = 0; i < cards.length; i++) {
+            if (cards[i].dataset.plant === plant) {
+                cards[i].className = 'plant-card ' + (complete ? 'complete' : 'incomplete');
+                var statusEl = cards[i].querySelector('.plant-status');
                 if (statusEl) {
-                    const d = plantDataEvening[plant];
-                    let filled = 0;
+                    var d = plantDataEvening[plant];
+                    var filled = 0;
                     if (d.volumeTomorrow && d.volumeTomorrow.trim() !== "") filled++;
                     if (d.tmReqPpc && d.tmReqPpc.trim() !== "") filled++;
-                    eveningCheckboxFields.forEach(f => { if (d[f.key] !== null) filled++; });
-                    for (let f of eveningCheckboxFields) {
-                        const key = f.key;
+                    eveningCheckboxFields.forEach(function(f) { if (d[f.key] !== null) filled++; });
+                    for (var j = 0; j < eveningCheckboxFields.length; j++) {
+                        var f = eveningCheckboxFields[j];
+                        var key = f.key;
                         if ((f.triggerOn === 'x' && d[key] === false) || (f.triggerOn === 'ok' && d[key] === true)) {
-                            if (d[`kendala_${key}`] && d[`kendala_${key}`].trim() !== "") filled++;
-                            if (d[`action_${key}`] && d[`action_${key}`].trim() !== "") filled++;
+                            if (d['kendala_' + key] && d['kendala_' + key].trim() !== "") filled++;
+                            if (d['action_' + key] && d['action_' + key].trim() !== "") filled++;
                         }
                     }
-                    const totalFields = 1 + 1 + eveningCheckboxFields.length + (eveningCheckboxFields.length * 2);
-                    const pct = (filled / totalFields) * 100;
-                    let statusClass = "empty", statusText = "Kosong";
+                    var totalFields = 1 + 1 + eveningCheckboxFields.length + (eveningCheckboxFields.length * 2);
+                    var pct = (filled / totalFields) * 100;
+                    var statusClass = "empty", statusText = "Kosong";
                     if (pct >= 90) { statusClass = "complete"; statusText = "✓ Lengkap"; }
                     else if (pct >= 30) { statusClass = "partial"; statusText = "⏳ Sebagian"; }
-                    statusEl.className = `plant-status ${statusClass}`;
-                    statusEl.textContent = `${statusText} (${Math.round(pct)}%)`;
+                    statusEl.className = 'plant-status ' + statusClass;
+                    statusEl.textContent = statusText + ' (' + Math.round(pct) + '%)';
                 }
-                const header = card.querySelector('.plant-header h2');
+                var header = cards[i].querySelector('.plant-header h2');
                 if (header) {
                     header.innerHTML = header.innerHTML.replace(/ ✅| ⏳/, '') + (complete ? ' ✅' : ' ⏳');
                 }
@@ -1712,27 +1675,18 @@
     }
 
     // ============================================================
-    // DATE FUNCTIONS
+    // SAVE / LOAD / DELETE
     // ============================================================
-    function getCurrentDate() {
-        const dateInput = document.getElementById("filterDate");
-        if (!dateInput.value) {
-            const today = new Date().toISOString().split('T')[0];
-            dateInput.value = today;
-        }
-        return dateInput.value;
-    }
-
     function saveByDate() {
         if (!isStorageAvailable) {
             alert("⚠️ Penyimpanan tidak tersedia. Gunakan Export JSON untuk backup.");
             return;
         }
-        const date = getCurrentDate();
-        const storageKey = `eastBU_${date}`;
+        var date = getCurrentDate();
+        var storageKey = 'eastBU_' + date;
         calculateTotalMorning();
         calculateTotalEvening();
-        const dataToSave = {
+        var dataToSave = {
             morning: plantDataMorning,
             evening: plantDataEvening,
             totalOrderMorning: totalOrderMorning,
@@ -1742,9 +1696,9 @@
             localStorage.setItem(storageKey, JSON.stringify(dataToSave));
             localStorage.setItem("eastBU_lastDate", date);
             updateStatusIndicator(date, true);
-            alert(`✅ Data untuk tanggal ${date} berhasil disimpan!`);
+            alert('✅ Data untuk tanggal ' + date + ' berhasil disimpan!');
         } catch(e) {
-            alert("❌ Gagal menyimpan: " + e.message);
+            alert('❌ Gagal menyimpan: ' + e.message);
         }
     }
 
@@ -1754,10 +1708,10 @@
             return;
         }
         isLoading = true;
-        const date = getCurrentDate();
-        const storageKey = `eastBU_${date}`;
+        var date = getCurrentDate();
+        var storageKey = 'eastBU_' + date;
         try {
-            const raw = localStorage.getItem(storageKey);
+            var raw = localStorage.getItem(storageKey);
             if (!raw) {
                 initMorningData(); initEveningData();
                 renderMorning(); renderEvening();
@@ -1765,11 +1719,11 @@
                 isLoading = false;
                 return;
             }
-            const saved = JSON.parse(raw);
+            var saved = JSON.parse(raw);
             if (saved.morning) {
-                plantNames.forEach(name => {
+                plantNames.forEach(function(name) {
                     if (!saved.morning[name]) return;
-                    Object.keys(saved.morning[name]).forEach(key => {
+                    Object.keys(saved.morning[name]).forEach(function(key) {
                         if (plantDataMorning[name] && plantDataMorning[name][key] !== undefined) {
                             plantDataMorning[name][key] = saved.morning[name][key];
                         }
@@ -1777,9 +1731,9 @@
                 });
             }
             if (saved.evening) {
-                plantNames.forEach(name => {
+                plantNames.forEach(function(name) {
                     if (!saved.evening[name]) return;
-                    Object.keys(saved.evening[name]).forEach(key => {
+                    Object.keys(saved.evening[name]).forEach(function(key) {
                         if (plantDataEvening[name] && plantDataEvening[name][key] !== undefined) {
                             plantDataEvening[name][key] = saved.evening[name][key];
                         }
@@ -1792,61 +1746,64 @@
             updateStatusIndicator(date, true);
             isLoading = false;
         } catch(e) {
-            alert("❌ Gagal memuat: " + e.message);
+            alert('❌ Gagal memuat: ' + e.message);
             isLoading = false;
         }
     }
 
     function deleteByDate() {
         if (!isStorageAvailable) return;
-        const date = getCurrentDate();
-        if (!confirm(`⚠️ Hapus semua data untuk ${date}?`)) return;
+        var date = getCurrentDate();
+        if (!confirm('⚠️ Hapus semua data untuk ' + date + '?')) return;
         try {
-            localStorage.removeItem(`eastBU_${date}`);
+            localStorage.removeItem('eastBU_' + date);
             initMorningData(); initEveningData();
             renderMorning(); renderEvening();
             updateStatusIndicator(date, false);
-            alert(`🗑️ Data ${date} dihapus.`);
-        } catch(e) { alert("❌ Gagal: " + e.message); }
+            alert('🗑️ Data ' + date + ' dihapus.');
+        } catch(e) { alert('❌ Gagal: ' + e.message); }
     }
 
     // ============================================================
     // JSON EXPORT / IMPORT
     // ============================================================
     function exportJSON() {
-        const date = getCurrentDate();
+        var date = getCurrentDate();
         calculateTotalMorning(); calculateTotalEvening();
-        const data = {
-            date, exportedAt: new Date().toISOString(),
-            morning: plantDataMorning, evening: plantDataEvening,
-            totalOrderMorning, totalOrderEvening
+        var data = {
+            date: date,
+            exportedAt: new Date().toISOString(),
+            morning: plantDataMorning,
+            evening: plantDataEvening,
+            totalOrderMorning: totalOrderMorning,
+            totalOrderEvening: totalOrderEvening
         };
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-        const a = document.createElement("a");
+        var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        var a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = `Checklist_EastBU_${date}.json`;
+        a.download = 'Checklist_EastBU_' + date + '.json';
         a.click();
         URL.revokeObjectURL(a.href);
         alert("✅ JSON berhasil diexport!");
     }
 
     function importJSON(event) {
-        const file = event.target.files[0];
+        var file = event.target.files[0];
         if (!file) return;
-        const reader = new FileReader();
+        var reader = new FileReader();
         reader.onload = function(e) {
             try {
-                const data = JSON.parse(e.target.result);
+                var data = JSON.parse(e.target.result);
                 if (!data.morning || !data.evening) { alert("❌ Format file tidak valid!"); return; }
-                plantNames.forEach(name => {
+                plantNames.forEach(function(name) {
                     if (data.morning[name]) {
-                        Object.keys(data.morning[name]).forEach(key => {
+                        Object.keys(data.morning[name]).forEach(function(key) {
                             if (plantDataMorning[name] && plantDataMorning[name][key] !== undefined)
                                 plantDataMorning[name][key] = data.morning[name][key];
                         });
                     }
                     if (data.evening[name]) {
-                        Object.keys(data.evening[name]).forEach(key => {
+                        Object.keys(data.evening[name]).forEach(function(key) {
                             if (plantDataEvening[name] && plantDataEvening[name][key] !== undefined)
                                 plantDataEvening[name][key] = data.evening[name][key];
                         });
@@ -1856,47 +1813,44 @@
                 if (data.totalOrderEvening !== undefined) totalOrderEvening = data.totalOrderEvening;
                 if (data.date) document.getElementById("filterDate").value = data.date;
                 renderMorning(); renderEvening();
-                alert(`✅ Data berhasil diimport!`);
+                alert('✅ Data berhasil diimport!');
                 if (isStorageAvailable) saveByDate();
-            } catch(err) { alert("❌ Gagal: " + err.message); }
+            } catch(err) { alert('❌ Gagal: ' + err.message); }
         };
         reader.readAsText(file);
         event.target.value = '';
     }
 
     // ============================================================
-    // EXPORT SUMMARY - TAMPILKAN SEMUA STATUS SEPERTI DI APLIKASI
+    // EXPORT SUMMARY
     // ============================================================
     function exportData() {
-        const date = getCurrentDate();
+        var date = getCurrentDate();
         calculateTotalMorning();
         calculateTotalEvening();
         
-        let text = `📋 EAST BU CHECKLIST – ${date}\n`;
-        text += "=".repeat(60) + "\n";
+        var text = '📋 EAST BU CHECKLIST – ' + date + '\n';
+        text += '='.repeat(60) + '\n';
         
         if (activeTab === 'morning') {
-            text += `🌅 MORNING CHECKLIST\n`;
-            text += `📊 TOTAL ORDER: ${totalOrderMorning.toLocaleString('id-ID')}\n`;
-            text += "=".repeat(60) + "\n\n";
+            text += '🌅 MORNING CHECKLIST\n';
+            text += '📊 TOTAL ORDER: ' + totalOrderMorning.toLocaleString('id-ID') + '\n';
+            text += '='.repeat(60) + '\n\n';
             
-            plantNames.forEach((name) => {
-                const d = plantDataMorning[name];
-                const complete = isPlantCompleteMorning(name);
-                text += `*${name.toUpperCase()}* ${complete ? '✅' : '⏳'}\n`;
+            plantNames.forEach(function(name) {
+                var d = plantDataMorning[name];
+                var complete = isPlantCompleteMorning(name);
+                text += '*' + name.toUpperCase() + '* ' + (complete ? '✅' : '⏳') + '\n';
                 
-                let no = 1;
-                // Order Volume
-                text += `   ${no}. Order Volume Today: ${d.orderVolume || "(kosong)"}\n`;
+                var no = 1;
+                text += '   ' + no + '. Order Volume Today: ' + (d.orderVolume || '(kosong)') + '\n';
                 no++;
                 
-                // Semua checkbox fields
-                morningCheckboxFields.forEach(f => {
-                    const key = f.key;
-                    const val = d[key];
+                morningCheckboxFields.forEach(function(f) {
+                    var key = f.key;
+                    var val = d[key];
                     
-                    // Status checkbox
-                    let statusDisplay = "";
+                    var statusDisplay = "";
                     if (val === null) {
                         statusDisplay = "[ ] Belum dipilih";
                     } else if (val === true) {
@@ -1921,49 +1875,46 @@
                         }
                     }
                     
-                    text += `   ${no}. ${f.label}: ${statusDisplay}\n`;
+                    text += '   ' + no + '. ' + f.label + ': ' + statusDisplay + '\n';
                     no++;
                     
-                    // Sub fields untuk TM Actual
                     if (key === 'tmActual' && val === false) {
-                        text += `      Actual TM: ${d.actualTm || "-"}\n`;
-                        text += `      Req PPC: ${d.reqPpc || "-"}\n";
+                        text += '      Actual TM: ' + (d.actualTm || '-') + '\n';
+                        text += '      Req PPC: ' + (d.reqPpc || '-') + '\n';
                     }
                     
-                    // Sub fields untuk Sudah Loading
                     if (key === 'sudahLoading' && val === false) {
-                        text += `      Keterangan: ${d.keteranganLoading || "-"}\n`;
+                        text += '      Keterangan: ' + (d.keteranganLoading || '-') + '\n';
                     }
                     
-                    // Constraint (Kendala & Action)
                     if ((f.triggerOn === 'x' && val === false) || (f.triggerOn === 'ok' && val === true)) {
-                        text += `      *Kendala: ${d[`kendala_${key}`] || "-"}*\n`;
-                        text += `      *Action: ${d[`action_${key}`] || "-"}*\n`;
+                        text += '      *Kendala: ' + (d['kendala_' + key] || '-') + '*\n';
+                        text += '      *Action: ' + (d['action_' + key] || '-') + '*\n';
                     }
                 });
-                text += "\n";
+                text += '\n';
             });
         } else {
-            text += `🌆 EVENING CHECKLIST\n`;
-            text += `📊 TOTAL ORDER: ${totalOrderEvening.toLocaleString('id-ID')}\n`;
-            text += "=".repeat(60) + "\n\n";
+            text += '🌆 EVENING CHECKLIST\n';
+            text += '📊 TOTAL ORDER: ' + totalOrderEvening.toLocaleString('id-ID') + '\n';
+            text += '='.repeat(60) + '\n\n';
             
-            plantNames.forEach((name) => {
-                const d = plantDataEvening[name];
-                const complete = isPlantCompleteEvening(name);
-                text += `*${name.toUpperCase()}* ${complete ? '✅' : '⏳'}\n`;
+            plantNames.forEach(function(name) {
+                var d = plantDataEvening[name];
+                var complete = isPlantCompleteEvening(name);
+                text += '*' + name.toUpperCase() + '* ' + (complete ? '✅' : '⏳') + '\n';
                 
-                let no = 1;
-                text += `   ${no}. Volume Tomorrow: ${d.volumeTomorrow || "(kosong)"}\n`;
+                var no = 1;
+                text += '   ' + no + '. Volume Tomorrow: ' + (d.volumeTomorrow || '(kosong)') + '\n';
                 no++;
-                text += `   ${no}. TM Req PPC: ${d.tmReqPpc || "(kosong)"}\n`;
+                text += '   ' + no + '. TM Req PPC: ' + (d.tmReqPpc || '(kosong)') + '\n';
                 no++;
                 
-                eveningCheckboxFields.forEach(f => {
-                    const key = f.key;
-                    const val = d[key];
+                eveningCheckboxFields.forEach(function(f) {
+                    var key = f.key;
+                    var val = d[key];
                     
-                    let statusDisplay = "";
+                    var statusDisplay = "";
                     if (val === null) {
                         statusDisplay = "[ ] Belum dipilih";
                     } else if (val === true) {
@@ -1980,25 +1931,25 @@
                         }
                     }
                     
-                    text += `   ${no}. ${f.label}: ${statusDisplay}\n`;
+                    text += '   ' + no + '. ' + f.label + ': ' + statusDisplay + '\n';
                     no++;
                     
                     if ((f.triggerOn === 'x' && val === false) || (f.triggerOn === 'ok' && val === true)) {
-                        text += `      *Kendala: ${d[`kendala_${key}`] || "-"}*\n`;
-                        text += `      *Action: ${d[`action_${key}`] || "-"}*\n`;
+                        text += '      *Kendala: ' + (d['kendala_' + key] || '-') + '*\n';
+                        text += '      *Action: ' + (d['action_' + key] || '-') + '*\n';
                     }
                 });
-                text += "\n";
+                text += '\n';
             });
         }
 
-        text += "=".repeat(60) + "\n";
-        text += `📅 ${new Date().toLocaleString()}\n`;
+        text += '='.repeat(60) + '\n';
+        text += '📅 ' + new Date().toLocaleString() + '\n';
         
-        const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-        const a = document.createElement("a");
+        var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+        var a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = `Checklist_EastBU_${date}_${activeTab}.txt`;
+        a.download = 'Checklist_EastBU_' + date + '_' + activeTab + '.txt';
         a.click();
         URL.revokeObjectURL(a.href);
     }
@@ -2007,14 +1958,14 @@
     // EXPORT EXCEL
     // ============================================================
     function exportExcel() {
-        const date = getCurrentDate();
+        var date = getCurrentDate();
         calculateTotalMorning();
         calculateTotalEvening();
-        let csv = "\uFEFF";
+        var csv = "\uFEFF";
         
         if (activeTab === 'morning') {
-            let headers = ['No', 'Plant', 'Order Volume'];
-            morningCheckboxFields.forEach(f => {
+            var headers = ['No', 'Plant', 'Order Volume'];
+            morningCheckboxFields.forEach(function(f) {
                 headers.push(f.label);
                 if (f.key === 'tmActual') {
                     headers.push('Actual TM', 'Req PPC');
@@ -2022,19 +1973,19 @@
                 if (f.key === 'sudahLoading') {
                     headers.push('Keterangan Loading');
                 }
-                headers.push(`Kendala ${f.label}`, `Action ${f.label}`);
+                headers.push('Kendala ' + f.label, 'Action ' + f.label);
             });
             headers.push('Status');
-            csv += headers.map(h => `"${h}"`).join(',') + '\n';
+            csv += headers.map(function(h) { return '"' + h + '"'; }).join(',') + '\n';
             
-            plantNames.forEach((name, idx) => {
-                const d = plantDataMorning[name];
-                const complete = isPlantCompleteMorning(name) ? 'COMPLETE' : 'INCOMPLETE';
-                let row = [(idx+1), name.toUpperCase(), d.orderVolume || ''];
-                morningCheckboxFields.forEach(f => {
-                    const key = f.key;
-                    const val = d[key];
-                    let status = '';
+            plantNames.forEach(function(name, idx) {
+                var d = plantDataMorning[name];
+                var complete = isPlantCompleteMorning(name) ? 'COMPLETE' : 'INCOMPLETE';
+                var row = [(idx+1), name.toUpperCase(), d.orderVolume || ''];
+                morningCheckboxFields.forEach(function(f) {
+                    var key = f.key;
+                    var val = d[key];
+                    var status = '';
                     if (val === null) status = 'Belum dipilih';
                     else if (val === true) {
                         if (f.triggerOn === 'ok') status = 'Ada';
@@ -2051,37 +2002,37 @@
                     if (key === 'sudahLoading') {
                         row.push(val === false ? (d.keteranganLoading || '') : '');
                     }
-                    const showConstraint = (f.triggerOn === 'x' && val === false) || (f.triggerOn === 'ok' && val === true);
-                    row.push(showConstraint ? (d[`kendala_${key}`] || '') : '');
-                    row.push(showConstraint ? (d[`action_${key}`] || '') : '');
+                    var showConstraint = (f.triggerOn === 'x' && val === false) || (f.triggerOn === 'ok' && val === true);
+                    row.push(showConstraint ? (d['kendala_' + key] || '') : '');
+                    row.push(showConstraint ? (d['action_' + key] || '') : '');
                 });
                 row.push(complete);
-                csv += row.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',') + '\n';
+                csv += row.map(function(c) { return '"' + String(c).replace(/"/g,'""') + '"'; }).join(',') + '\n';
             });
-            csv += `\n"TOTAL ORDER","${totalOrderMorning.toLocaleString('id-ID')}"\n`;
+            csv += '\n"TOTAL ORDER","' + totalOrderMorning.toLocaleString('id-ID') + '"\n';
             
         } else {
-            let headers = ['No', 'Plant', 'Volume Tomorrow', 'TM Req PPC'];
-            eveningCheckboxFields.forEach(f => {
-                headers.push(f.label);
-                headers.push(`Kendala ${f.label}`, `Action ${f.label}`);
+            var headers2 = ['No', 'Plant', 'Volume Tomorrow', 'TM Req PPC'];
+            eveningCheckboxFields.forEach(function(f) {
+                headers2.push(f.label);
+                headers2.push('Kendala ' + f.label, 'Action ' + f.label);
             });
-            headers.push('Status');
-            csv += headers.map(h => `"${h}"`).join(',') + '\n';
+            headers2.push('Status');
+            csv += headers2.map(function(h) { return '"' + h + '"'; }).join(',') + '\n';
             
-            plantNames.forEach((name, idx) => {
-                const d = plantDataEvening[name];
-                const complete = isPlantCompleteEvening(name) ? 'COMPLETE' : 'INCOMPLETE';
-                let row = [
+            plantNames.forEach(function(name, idx) {
+                var d = plantDataEvening[name];
+                var complete = isPlantCompleteEvening(name) ? 'COMPLETE' : 'INCOMPLETE';
+                var row = [
                     (idx+1),
                     name.toUpperCase(),
                     d.volumeTomorrow || '',
                     d.tmReqPpc || ''
                 ];
-                eveningCheckboxFields.forEach(f => {
-                    const key = f.key;
-                    const val = d[key];
-                    let status = '';
+                eveningCheckboxFields.forEach(function(f) {
+                    var key = f.key;
+                    var val = d[key];
+                    var status = '';
                     if (val === null) status = 'Belum dipilih';
                     else if (val === true) {
                         if (f.triggerOn === 'ok') status = 'Ada';
@@ -2091,20 +2042,20 @@
                         else status = 'Tidak Ada';
                     }
                     row.push(status);
-                    const showConstraint = (f.triggerOn === 'x' && val === false) || (f.triggerOn === 'ok' && val === true);
-                    row.push(showConstraint ? (d[`kendala_${key}`] || '') : '');
-                    row.push(showConstraint ? (d[`action_${key}`] || '') : '');
+                    var showConstraint = (f.triggerOn === 'x' && val === false) || (f.triggerOn === 'ok' && val === true);
+                    row.push(showConstraint ? (d['kendala_' + key] || '') : '');
+                    row.push(showConstraint ? (d['action_' + key] || '') : '');
                 });
                 row.push(complete);
-                csv += row.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',') + '\n';
+                csv += row.map(function(c) { return '"' + String(c).replace(/"/g,'""') + '"'; }).join(',') + '\n';
             });
-            csv += `\n"TOTAL ORDER","${totalOrderEvening.toLocaleString('id-ID')}"\n`;
+            csv += '\n"TOTAL ORDER","' + totalOrderEvening.toLocaleString('id-ID') + '"\n';
         }
 
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-        const a = document.createElement("a");
+        var blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        var a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = `Checklist_EastBU_${date}_${activeTab}.csv`;
+        a.download = 'Checklist_EastBU_' + date + '_' + activeTab + '.csv';
         a.click();
         URL.revokeObjectURL(a.href);
     }
@@ -2116,7 +2067,7 @@
         if (!confirm("⚠️ Reset semua data yang sedang diisi?")) return;
         initMorningData(); initEveningData();
         renderMorning(); renderEvening();
-        const date = getCurrentDate();
+        var date = getCurrentDate();
         updateStatusIndicator(date, false);
         alert("🔄 Data direset.");
     }
@@ -2125,15 +2076,15 @@
     // AUTO LOAD
     // ============================================================
     window.onload = function() {
-        const today = new Date().toISOString().split('T')[0];
+        var today = new Date().toISOString().split('T')[0];
         document.getElementById("filterDate").value = today;
         if (isStorageAvailable) {
-            const lastDate = localStorage.getItem("eastBU_lastDate");
+            var lastDate = localStorage.getItem("eastBU_lastDate");
             if (lastDate) document.getElementById("filterDate").value = lastDate;
             loadByDate();
         } else {
             renderMorning(); renderEvening();
-            const date = getCurrentDate();
+            var date = getCurrentDate();
             updateStatusIndicator(date, false);
         }
         renderMorning();
