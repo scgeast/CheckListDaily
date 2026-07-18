@@ -1,0 +1,2144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>East BU – Morning & Evening Checklist</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        h1 {
+            text-align: center;
+            color: #1a3c5e;
+            font-size: 28px;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        .sub-title {
+            text-align: center;
+            color: #5a7a9a;
+            font-size: 16px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #dce3ed;
+            padding-bottom: 8px;
+        }
+
+        .tab-btn {
+            padding: 10px 28px;
+            border: none;
+            background: #eaf0f6;
+            border-radius: 30px 30px 0 0;
+            font-weight: 600;
+            font-size: 16px;
+            color: #2c5779;
+            cursor: pointer;
+            transition: 0.2s;
+            letter-spacing: 0.5px;
+        }
+
+        .tab-btn:hover {
+            background: #d2dfec;
+        }
+
+        .tab-btn.active {
+            background: #1a4b6d;
+            color: white;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fade 0.3s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fade {
+            0% { opacity: 0.4; transform: translateY(4px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .storage-warning {
+            background: #fef3c7;
+            border: 1px solid #d48c2c;
+            border-radius: 8px;
+            padding: 10px 16px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #7a5d1a;
+            display: none;
+        }
+
+        .storage-warning.show {
+            display: block;
+        }
+
+        .filter-section {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            border: 1px solid #dce3ed;
+        }
+
+        .filter-section label {
+            font-weight: 600;
+            color: #1a3c5e;
+            font-size: 15px;
+        }
+
+        .filter-section input[type="date"] {
+            padding: 8px 14px;
+            border: 1.5px solid #d0d9e8;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            flex: 1;
+            min-width: 180px;
+            cursor: pointer;
+        }
+
+        .filter-section input[type="date"]:focus {
+            outline: none;
+            border-color: #2b6c94;
+            box-shadow: 0 0 0 3px rgba(43,108,148,0.15);
+        }
+
+        .filter-section .btn-sm {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .filter-section .btn-sm-primary {
+            background: #1a4b6d;
+            color: white;
+        }
+        .filter-section .btn-sm-primary:hover {
+            background: #0f3a55;
+        }
+        .filter-section .btn-sm-success {
+            background: #1e7a5e;
+            color: white;
+        }
+        .filter-section .btn-sm-success:hover {
+            background: #136349;
+        }
+        .filter-section .btn-sm-danger {
+            background: #a43a3a;
+            color: white;
+        }
+        .filter-section .btn-sm-danger:hover {
+            background: #882b2b;
+        }
+        .filter-section .btn-sm-warning {
+            background: #d48c2c;
+            color: white;
+        }
+        .filter-section .btn-sm-warning:hover {
+            background: #b8771f;
+        }
+
+        .filter-section .status-indicator {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 4px 14px;
+            border-radius: 20px;
+            background: #d1d9e6;
+            color: #1f3a57;
+        }
+
+        .filter-section .status-indicator.has-data {
+            background: #b8e0c9;
+            color: #0f4a2e;
+        }
+
+        .filter-section .status-indicator.no-data {
+            background: #f8d0d0;
+            color: #7a1a1a;
+        }
+
+        .notification-banner {
+            padding: 14px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: none;
+            font-weight: 600;
+            font-size: 15px;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .notification-banner.show {
+            display: flex;
+        }
+        .notification-banner.warning {
+            background: #fef3c7;
+            border-left: 6px solid #d48c2c;
+            color: #7a5d1a;
+        }
+        .notification-banner.success {
+            background: #d1fae5;
+            border-left: 6px solid #1e7a5e;
+            color: #0f4a2e;
+        }
+        .notification-banner .icon {
+            font-size: 24px;
+        }
+        .notification-banner .details {
+            flex: 1;
+        }
+        .notification-banner .badge-count {
+            background: #a43a3a;
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .notification-banner .badge-count.green {
+            background: #1e7a5e;
+        }
+
+        .plant-card {
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            transition: 0.3s;
+            background: #fafbfc;
+            border-left: 6px solid #2b6c94;
+        }
+
+        .plant-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.10);
+        }
+
+        .plant-card.incomplete {
+            background: #fce4ec !important;
+            border-left-color: #e57373 !important;
+        }
+
+        .plant-card.complete {
+            background: #e8f5e9 !important;
+            border-left-color: #66bb6a !important;
+        }
+
+        .plant-card.complete:hover {
+            background: #c8e6c9 !important;
+        }
+
+        .plant-card.incomplete:hover {
+            background: #f8d7da !important;
+        }
+
+        .plant-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .plant-header h2 {
+            font-size: 20px;
+            color: #0b2a44;
+        }
+
+        .plant-header h2 .color-dot {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .plant-card:nth-child(1) .color-dot { background: #2b6c94; }
+        .plant-card:nth-child(2) .color-dot { background: #2d8f6f; }
+        .plant-card:nth-child(3) .color-dot { background: #b3772e; }
+        .plant-card:nth-child(4) .color-dot { background: #8e44ad; }
+        .plant-card:nth-child(5) .color-dot { background: #c0392b; }
+        .plant-card:nth-child(6) .color-dot { background: #2980b9; }
+        .plant-card:nth-child(7) .color-dot { background: #7f8c8d; }
+
+        .plant-status {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 14px;
+            border-radius: 20px;
+            background: #d1d9e6;
+            color: #1f3a57;
+        }
+
+        .plant-status.complete {
+            background: #b8e0c9;
+            color: #0f4a2e;
+        }
+
+        .plant-status.partial {
+            background: #fde6b3;
+            color: #7a5d1a;
+        }
+
+        .plant-status.empty {
+            background: #f8d0d0;
+            color: #7a1a1a;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px 30px;
+        }
+
+        .field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
+            font-size: 15px;
+            flex-wrap: wrap;
+        }
+
+        .field label {
+            font-weight: 600;
+            color: #1e3a5f;
+            min-width: 160px;
+        }
+
+        .field input[type="text"],
+        .field input[type="number"] {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1.5px solid #d0d9e8;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            transition: 0.2s;
+            min-width: 100px;
+        }
+
+        .field input[type="text"]:focus,
+        .field input[type="number"]:focus {
+            outline: none;
+            border-color: #2b6c94;
+            box-shadow: 0 0 0 3px rgba(43,108,148,0.15);
+        }
+
+        .field input[type="text"]::placeholder,
+        .field input[type="number"]::placeholder {
+            color: #b0bcca;
+            font-size: 12px;
+        }
+
+        .field input[type="number"] {
+            -moz-appearance: textfield;
+            width: 100%;
+        }
+
+        .field input[type="number"]::-webkit-outer-spin-button,
+        .field input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-group label {
+            min-width: auto;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px 4px 6px;
+            border-radius: 20px;
+            transition: 0.2s;
+        }
+
+        .checkbox-group label:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #1a4b6d;
+        }
+
+        .checkbox-ok {
+            color: #1e7a5e;
+        }
+        .checkbox-ok input[type="checkbox"] {
+            accent-color: #1e7a5e;
+        }
+        .checkbox-x {
+            color: #a43a3a;
+        }
+        .checkbox-x input[type="checkbox"] {
+            accent-color: #a43a3a;
+        }
+        .checkbox-label-icon {
+            font-size: 16px;
+        }
+
+        .sub-fields {
+            margin-top: 6px;
+            margin-left: 170px;
+            padding: 10px 14px;
+            background: #fef8f0;
+            border-radius: 8px;
+            border-left: 4px solid #d48c2c;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            grid-column: 1 / -1;
+        }
+
+        .sub-fields.show {
+            display: flex;
+        }
+
+        .sub-field-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .sub-field-row label {
+            font-weight: 600;
+            color: #7a5d1a;
+            min-width: 120px;
+            font-size: 14px;
+        }
+
+        .sub-field-row input {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1.5px solid #d0d9e8;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 150px;
+            background: white;
+        }
+
+        .sub-field-row input:focus {
+            outline: none;
+            border-color: #d48c2c;
+            box-shadow: 0 0 0 3px rgba(212,140,44,0.15);
+        }
+
+        .sub-fields-loading {
+            margin-top: 6px;
+            margin-left: 170px;
+            padding: 10px 14px;
+            background: #f0f7fc;
+            border-radius: 8px;
+            border-left: 4px solid #2b6c94;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            grid-column: 1 / -1;
+        }
+
+        .sub-fields-loading.show {
+            display: flex;
+        }
+
+        .sub-field-row-loading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .sub-field-row-loading label {
+            font-weight: 600;
+            color: #1a3c5e;
+            min-width: 120px;
+            font-size: 14px;
+        }
+
+        .sub-field-row-loading input {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1.5px solid #d0d9e8;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 150px;
+            background: white;
+        }
+
+        .sub-field-row-loading input:focus {
+            outline: none;
+            border-color: #2b6c94;
+            box-shadow: 0 0 0 3px rgba(43,108,148,0.15);
+        }
+
+        .constraint-item {
+            margin-top: 6px;
+            margin-left: 170px;
+            padding: 10px 14px;
+            background: #fff5f5;
+            border-radius: 8px;
+            border-left: 4px solid #a43a3a;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            grid-column: 1 / -1;
+        }
+
+        .constraint-item.show {
+            display: flex;
+        }
+
+        .constraint-item .constraint-title {
+            font-weight: 700;
+            color: #7a1a1a;
+            font-size: 13px;
+            margin-bottom: 2px;
+        }
+
+        .constraint-item .constraint-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .constraint-item .constraint-row label {
+            font-weight: 600;
+            color: #7a1a1a;
+            min-width: 80px;
+            font-size: 14px;
+        }
+
+        .constraint-item .constraint-row input {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1.5px solid #d0d9e8;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 150px;
+            background: white;
+        }
+
+        .constraint-item .constraint-row input:focus {
+            outline: none;
+            border-color: #a43a3a;
+            box-shadow: 0 0 0 3px rgba(164,58,58,0.15);
+        }
+
+        .constraint-item .constraint-row input::placeholder {
+            color: #b0bcca;
+            font-size: 12px;
+        }
+
+        .total-order-section {
+            background: #1a3c5e;
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .total-order-section label {
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .total-order-section .total-display {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 22px;
+            font-weight: 700;
+            width: 220px;
+            background: #fde6b3;
+            color: #1a3c5e;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .total-order-section .total-display.pop {
+            animation: pop 0.3s ease;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.10); background: #ffd966; }
+            100% { transform: scale(1); }
+        }
+
+        .total-order-section .total-label {
+            color: #fde6b3;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .total-order-section .total-hint {
+            color: rgba(255,255,255,0.6);
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        .total-order-section .total-count {
+            color: white;
+            font-size: 13px;
+            background: rgba(255,255,255,0.15);
+            padding: 4px 14px;
+            border-radius: 20px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .btn {
+            padding: 10px 30px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .btn-primary {
+            background: #1a4b6d;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #0f3a55;
+            transform: scale(1.02);
+        }
+        .btn-success {
+            background: #1e7a5e;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #136349;
+            transform: scale(1.02);
+        }
+        .btn-danger {
+            background: #a43a3a;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #882b2b;
+            transform: scale(1.02);
+        }
+        .btn-outline {
+            background: transparent;
+            color: #1a4b6d;
+            border: 2px solid #1a4b6d;
+        }
+        .btn-outline:hover {
+            background: #1a4b6d;
+            color: white;
+        }
+        .btn-warning {
+            background: #d48c2c;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #b8771f;
+            transform: scale(1.02);
+        }
+        .btn-info {
+            background: #5a7a9a;
+            color: white;
+        }
+        .btn-info:hover {
+            background: #4a6a8a;
+            transform: scale(1.02);
+        }
+
+        .footer-info {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #7a8fa5;
+        }
+
+        .tm-req-field {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
+            font-size: 15px;
+            flex-wrap: wrap;
+            grid-column: 1 / -1;
+            background: #f8faff;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border-left: 4px solid #2b6c94;
+            margin-top: 4px;
+        }
+
+        .tm-req-field label {
+            font-weight: 600;
+            color: #1e3a5f;
+            min-width: 160px;
+        }
+
+        .tm-req-field input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1.5px solid #d0d9e8;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            min-width: 120px;
+        }
+
+        .tm-req-field input:focus {
+            outline: none;
+            border-color: #2b6c94;
+            box-shadow: 0 0 0 3px rgba(43,108,148,0.15);
+        }
+
+        .plant-card {
+            scroll-margin-top: 100px;
+        }
+
+        .plant-card input,
+        .plant-card .constraint-item input,
+        .plant-card .sub-fields input,
+        .plant-card .sub-fields-loading input,
+        .plant-card .tm-req-field input {
+            transition: none !important;
+        }
+
+        .plant-card input:focus,
+        .plant-card .constraint-item input:focus,
+        .plant-card .sub-fields input:focus,
+        .plant-card .sub-fields-loading input:focus,
+        .plant-card .tm-req-field input:focus {
+            transition: none !important;
+        }
+
+        @media (max-width: 850px) {
+            .row {
+                grid-template-columns: 1fr;
+                gap: 4px;
+            }
+            .field label {
+                min-width: 140px;
+                font-size: 14px;
+            }
+            .sub-fields {
+                margin-left: 0;
+            }
+            .sub-fields-loading {
+                margin-left: 0;
+            }
+            .constraint-item {
+                margin-left: 0;
+            }
+            .constraint-item .constraint-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .constraint-item .constraint-row label {
+                min-width: auto;
+            }
+            .constraint-item .constraint-row input {
+                min-width: auto;
+            }
+            .sub-field-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .sub-field-row label {
+                min-width: auto;
+            }
+            .sub-field-row input {
+                min-width: auto;
+            }
+            .sub-field-row-loading {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .sub-field-row-loading label {
+                min-width: auto;
+            }
+            .sub-field-row-loading input {
+                min-width: auto;
+            }
+            .tm-req-field {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .tm-req-field label {
+                min-width: auto;
+            }
+            .plant-card {
+                padding: 14px;
+            }
+            .container {
+                padding: 16px;
+            }
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+            .actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-section input[type="date"] {
+                min-width: auto;
+            }
+            .notification-banner {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            .total-order-section {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            .total-order-section .total-display {
+                width: 100%;
+            }
+        }
+
+        @media print {
+            .btn, .actions, .notification-banner, .filter-section, .storage-warning, .tabs, .tab-btn {
+                display: none !important;
+            }
+            .plant-card {
+                break-inside: avoid;
+                border-left-color: #1a4b6d !important;
+                background: #fff !important;
+            }
+            .plant-card:nth-child(1),
+            .plant-card:nth-child(2),
+            .plant-card:nth-child(3),
+            .plant-card:nth-child(4),
+            .plant-card:nth-child(5),
+            .plant-card:nth-child(6),
+            .plant-card:nth-child(7) {
+                background: #fff !important;
+                border-left-color: #333 !important;
+            }
+            .field input[type="text"],
+            .field input[type="number"] {
+                border: none;
+                border-bottom: 1px solid #999;
+                background: transparent;
+            }
+            .sub-fields {
+                background: #f5f0e8 !important;
+                border-left-color: #666 !important;
+            }
+            .sub-fields-loading {
+                background: #f0f4f8 !important;
+                border-left-color: #666 !important;
+            }
+            .constraint-item {
+                background: #faf0f0 !important;
+                border-left-color: #666 !important;
+            }
+            .checkbox-group input[type="checkbox"] {
+                accent-color: #000;
+            }
+            .color-dot {
+                display: none !important;
+            }
+            .total-order-section {
+                background: #333 !important;
+                color: white !important;
+            }
+            .total-order-section .total-display {
+                background: #f5f5f5 !important;
+                color: #333 !important;
+                border: 1px solid #999 !important;
+            }
+            .tm-req-field {
+                background: #f5f5f5 !important;
+                border-left-color: #666 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="app">
+    <h1>📋 <span style="font-weight:700;">EAST BU CHECKLIST</span></h1>
+    <div class="sub-title">Morning & Evening · Real-Time</div>
+
+    <div class="storage-warning" id="storageWarning">
+        ⚠️ <strong>Mode Local File:</strong> Penyimpanan data mungkin terbatas. 
+        Gunakan tombol <strong>"Export JSON"</strong> untuk backup data secara manual.
+    </div>
+
+    <div class="filter-section">
+        <label>📅 Tanggal:</label>
+        <input type="date" id="filterDate" onchange="onDateChange()" />
+        <button class="btn-sm btn-sm-primary" onclick="loadByDate()">📂 Load</button>
+        <button class="btn-sm btn-sm-success" onclick="saveByDate()">💾 Save</button>
+        <button class="btn-sm btn-sm-danger" onclick="deleteByDate()">🗑️ Delete</button>
+        <button class="btn-sm btn-sm-warning" onclick="exportJSON()">📦 Export JSON</button>
+        <button class="btn-sm btn-sm-primary" onclick="document.getElementById('importJSON').click()">📥 Import JSON</button>
+        <input type="file" id="importJSON" accept=".json" style="display:none" onchange="importJSON(event)" />
+        <span class="status-indicator" id="statusIndicator">📅 Pilih tanggal</span>
+    </div>
+
+    <div id="notificationBanner" class="notification-banner">
+        <span class="icon">🔔</span>
+        <span class="details" id="notificationText">Loading...</span>
+        <span class="badge-count" id="notificationBadge">0</span>
+    </div>
+
+    <div class="tabs" id="tabHeaders">
+        <button class="tab-btn active" data-tab="morning">🌅 Morning Checklist</button>
+        <button class="tab-btn" data-tab="evening">🌆 Evening Checklist</button>
+    </div>
+
+    <div id="tabMorning" class="tab-content active">
+        <div class="total-order-section">
+            <div>
+                <label>📊 TOTAL ORDER (Morning)</label>
+                <span class="total-label">(Akumulasi semua plant)</span>
+                <span class="total-hint"> — otomatis terisi</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <span class="total-count" id="plantCountMorning">0 Plant</span>
+                <span class="total-display" id="totalOrderDisplayMorning">0</span>
+            </div>
+        </div>
+        <div id="plantContainerMorning"></div>
+    </div>
+
+    <div id="tabEvening" class="tab-content">
+        <div class="total-order-section">
+            <div>
+                <label>📊 TOTAL ORDER (Evening)</label>
+                <span class="total-label">(Akumulasi semua plant)</span>
+                <span class="total-hint"> — otomatis terisi</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <span class="total-count" id="plantCountEvening">0 Plant</span>
+                <span class="total-display" id="totalOrderDisplayEvening">0</span>
+            </div>
+        </div>
+        <div id="plantContainerEvening"></div>
+    </div>
+
+    <div class="actions">
+        <button class="btn btn-primary" onclick="exportData()">📥 Export Summary</button>
+        <button class="btn btn-warning" onclick="exportExcel()">📊 Export Excel</button>
+        <button class="btn btn-info" onclick="checkCompleteness()">🔍 Cek Kelengkapan</button>
+        <button class="btn btn-danger" onclick="resetAll()">🔄 Reset All</button>
+        <button class="btn btn-outline" onclick="window.print()">🖨️ Print / PDF</button>
+    </div>
+
+    <div class="footer-info">
+        ⚡ Pilih tanggal, otomatis load data jika sudah ada.<br/>
+        🟥 Merah muda = Belum lengkap &nbsp;|&nbsp; 🟩 Hijau muda = Lengkap
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    // DATA DEFINITION – MORNING & EVENING
+    // ============================================================
+    const plantNames = [
+        "Denpasar 2",
+        "Gianyar",
+        "Manyar",
+        "Manukan",
+        "Kediri",
+        "Gempol",
+        "Krian"
+    ];
+
+    const morningCheckboxFields = [
+        { key: "tmActual", label: "TM Actual x PPC", triggerOn: "x" },
+        { key: "material", label: "Material", triggerOn: "x" },
+        { key: "flyAsh", label: "Fly Ash", triggerOn: "x" },
+        { key: "semen", label: "Semen", triggerOn: "x" },
+        { key: "orderBooking", label: "Order On Booking", triggerOn: "ok" },
+        { key: "orderTb", label: "Order TB Site / TB PO", triggerOn: "ok" },
+        { key: "orderOvernight", label: "Order Overnight lanjut sampai pagi", triggerOn: "ok" },
+        { key: "sudahLoading", label: "Sudah Loading", triggerOn: "x" }
+    ];
+
+    const eveningCheckboxFields = [
+        { key: "material", label: "Material", triggerOn: "x" },
+        { key: "flyAsh", label: "Fly Ash", triggerOn: "x" },
+        { key: "semen", label: "Semen", triggerOn: "x" },
+        { key: "orderBooking", label: "Order On Booking", triggerOn: "ok" },
+        { key: "orderTb", label: "Order TB Site / TB PO", triggerOn: "ok" },
+        { key: "onGoingProject", label: "On Going Project", triggerOn: "ok" }
+    ];
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    let plantDataMorning = {};
+    let plantDataEvening = {};
+    let totalOrderMorning = 0;
+    let totalOrderEvening = 0;
+    let currentDate = "";
+    let isStorageAvailable = false;
+    let isLoading = false;
+    let activeTab = 'morning';
+    let isRendering = false;
+
+    try {
+        localStorage.setItem('test', 'test');
+        localStorage.removeItem('test');
+        isStorageAvailable = true;
+    } catch(e) {
+        isStorageAvailable = false;
+        document.getElementById('storageWarning').classList.add('show');
+    }
+
+    function initMorningData() {
+        plantDataMorning = {};
+        plantNames.forEach(name => {
+            plantDataMorning[name] = {
+                orderVolume: "",
+                tmActual: null,
+                actualTm: "",
+                reqPpc: "",
+                material: null,
+                flyAsh: null,
+                semen: null,
+                orderBooking: null,
+                orderTb: null,
+                orderOvernight: null,
+                sudahLoading: null,
+                keteranganLoading: "",
+                kendala_tmActual: "",
+                action_tmActual: "",
+                kendala_material: "",
+                action_material: "",
+                kendala_flyAsh: "",
+                action_flyAsh: "",
+                kendala_semen: "",
+                action_semen: "",
+                kendala_orderBooking: "",
+                action_orderBooking: "",
+                kendala_orderTb: "",
+                action_orderTb: "",
+                kendala_orderOvernight: "",
+                action_orderOvernight: "",
+                kendala_sudahLoading: "",
+                action_sudahLoading: ""
+            };
+        });
+        totalOrderMorning = 0;
+    }
+
+    function initEveningData() {
+        plantDataEvening = {};
+        plantNames.forEach(name => {
+            plantDataEvening[name] = {
+                volumeTomorrow: "",
+                tmReqPpc: "",
+                material: null,
+                flyAsh: null,
+                semen: null,
+                orderBooking: null,
+                orderTb: null,
+                onGoingProject: null,
+                kendala_material: "",
+                action_material: "",
+                kendala_flyAsh: "",
+                action_flyAsh: "",
+                kendala_semen: "",
+                action_semen: "",
+                kendala_orderBooking: "",
+                action_orderBooking: "",
+                kendala_orderTb: "",
+                action_orderTb: "",
+                kendala_onGoingProject: "",
+                action_onGoingProject: ""
+            };
+        });
+        totalOrderEvening = 0;
+    }
+
+    initMorningData();
+    initEveningData();
+
+    // ============================================================
+    // TABS
+    // ============================================================
+    document.getElementById('tabHeaders').addEventListener('click', function(e) {
+        const btn = e.target.closest('.tab-btn');
+        if (!btn) return;
+        const tab = btn.dataset.tab;
+        activeTab = tab;
+
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        if (tab === 'morning') {
+            document.getElementById('tabMorning').classList.add('active');
+            renderMorning();
+        } else {
+            document.getElementById('tabEvening').classList.add('active');
+            renderEvening();
+        }
+        updateNotification();
+    });
+
+    // ============================================================
+    // DATE CHANGE - AUTO LOAD
+    // ============================================================
+    function onDateChange() {
+        if (isLoading) return;
+        const date = getCurrentDate();
+        if (!date) return;
+        
+        const storageKey = `eastBU_${date}`;
+        const hasData = isStorageAvailable && localStorage.getItem(storageKey) !== null;
+        
+        updateStatusIndicator(date, hasData);
+        
+        if (hasData) {
+            loadByDate();
+        } else {
+            initMorningData();
+            initEveningData();
+            renderMorning();
+            renderEvening();
+            const banner = document.getElementById("notificationBanner");
+            const text = document.getElementById("notificationText");
+            const badge = document.getElementById("notificationBadge");
+            banner.className = "notification-banner show warning";
+            text.innerHTML = `📅 Tanggal <strong>${date}</strong> - Belum ada data. Silakan isi data baru.`;
+            badge.textContent = "📝 NEW";
+            badge.className = "badge-count";
+        }
+    }
+
+    function updateStatusIndicator(date, hasData) {
+        const indicator = document.getElementById("statusIndicator");
+        if (hasData) {
+            indicator.className = "status-indicator has-data";
+            indicator.textContent = `✅ ${date} - Ada data`;
+        } else {
+            indicator.className = "status-indicator no-data";
+            indicator.textContent = `📅 ${date} - Kosong`;
+        }
+    }
+
+    // ============================================================
+    // TOTAL ORDER
+    // ============================================================
+    function calculateTotalMorning() {
+        let sum = 0, count = 0;
+        plantNames.forEach(name => {
+            const d = plantDataMorning[name];
+            if (d && d.orderVolume && d.orderVolume.trim() !== "") {
+                const val = parseFloat(d.orderVolume.replace(/,/g, '')) || 0;
+                sum += val;
+                count++;
+            }
+        });
+        totalOrderMorning = sum;
+        return { sum, count };
+    }
+
+    function calculateTotalEvening() {
+        let sum = 0, count = 0;
+        plantNames.forEach(name => {
+            const d = plantDataEvening[name];
+            if (d && d.volumeTomorrow && d.volumeTomorrow.trim() !== "") {
+                const val = parseFloat(d.volumeTomorrow.replace(/,/g, '')) || 0;
+                sum += val;
+                count++;
+            }
+        });
+        totalOrderEvening = sum;
+        return { sum, count };
+    }
+
+    function updateTotalDisplays() {
+        const { sum: sumM, count: countM } = calculateTotalMorning();
+        const displayM = document.getElementById('totalOrderDisplayMorning');
+        const countMEl = document.getElementById('plantCountMorning');
+        if (displayM) { displayM.textContent = sumM.toLocaleString('id-ID'); displayM.classList.remove('pop'); void displayM.offsetWidth; displayM.classList.add('pop'); }
+        if (countMEl) countMEl.textContent = `${countM} Plant`;
+
+        const { sum: sumE, count: countE } = calculateTotalEvening();
+        const displayE = document.getElementById('totalOrderDisplayEvening');
+        const countEEl = document.getElementById('plantCountEvening');
+        if (displayE) { displayE.textContent = sumE.toLocaleString('id-ID'); displayE.classList.remove('pop'); void displayE.offsetWidth; displayE.classList.add('pop'); }
+        if (countEEl) countEEl.textContent = `${countE} Plant`;
+    }
+
+    // ============================================================
+    // CHECK COMPLETENESS
+    // ============================================================
+    function getCompleteness() {
+        let totalIssues = 0;
+        let incompletePlants = [];
+        let missingFields = {};
+
+        plantNames.forEach(name => {
+            const d = plantDataMorning[name];
+            let issues = [];
+            if (!d.orderVolume || d.orderVolume.trim() === "") issues.push("Order Volume Today");
+            morningCheckboxFields.forEach(f => {
+                if (d[f.key] === null) issues.push(`${f.label} (belum dipilih)`);
+            });
+            if (d.tmActual === false) {
+                if (!d.actualTm || d.actualTm.trim() === "") issues.push("Actual TM");
+                if (!d.reqPpc || d.reqPpc.trim() === "") issues.push("Req PPC");
+            }
+            if (d.sudahLoading === false) {
+                if (!d.keteranganLoading || d.keteranganLoading.trim() === "") issues.push("Keterangan Loading");
+            }
+            morningCheckboxFields.forEach(f => {
+                const key = f.key;
+                if ((f.triggerOn === 'x' && d[key] === false) || (f.triggerOn === 'ok' && d[key] === true)) {
+                    if (!d[`kendala_${key}`] || d[`kendala_${key}`].trim() === "") issues.push(`Kendala ${f.label}`);
+                    if (!d[`action_${key}`] || d[`action_${key}`].trim() === "") issues.push(`Action ${f.label}`);
+                }
+            });
+            if (issues.length > 0) { incompletePlants.push(name + " (M)"); missingFields[name + " (M)"] = issues; totalIssues += issues.length; }
+        });
+
+        plantNames.forEach(name => {
+            const d = plantDataEvening[name];
+            let issues = [];
+            if (!d.volumeTomorrow || d.volumeTomorrow.trim() === "") issues.push("Volume Tomorrow");
+            if (!d.tmReqPpc || d.tmReqPpc.trim() === "") issues.push("TM Req PPC (belum diisi)");
+            
+            eveningCheckboxFields.forEach(f => {
+                if (d[f.key] === null) issues.push(`${f.label} (belum dipilih)`);
+            });
+            eveningCheckboxFields.forEach(f => {
+                const key = f.key;
+                if ((f.triggerOn === 'x' && d[key] === false) || (f.triggerOn === 'ok' && d[key] === true)) {
+                    if (!d[`kendala_${key}`] || d[`kendala_${key}`].trim() === "") issues.push(`Kendala ${f.label}`);
+                    if (!d[`action_${key}`] || d[`action_${key}`].trim() === "") issues.push(`Action ${f.label}`);
+                }
+            });
+            if (issues.length > 0) { incompletePlants.push(name + " (E)"); missingFields[name + " (E)"] = issues; totalIssues += issues.length; }
+        });
+
+        return { totalIssues, incompletePlants, missingFields };
+    }
+
+    function updateNotification() {
+        const banner = document.getElementById("notificationBanner");
+        const text = document.getElementById("notificationText");
+        const badge = document.getElementById("notificationBadge");
+        const { totalIssues, incompletePlants, missingFields } = getCompleteness();
+
+        if (totalIssues === 0) {
+            banner.className = "notification-banner show success";
+            text.innerHTML = "🎉 Semua data lengkap! Morning & Evening sudah terisi.";
+            badge.textContent = "✓ COMPLETE";
+            badge.className = "badge-count green";
+        } else {
+            banner.className = "notification-banner show warning";
+            let detailText = `⚠️ ${totalIssues} data belum lengkap pada ${incompletePlants.length} area: `;
+            detailText += incompletePlants.join(", ");
+            text.innerHTML = detailText;
+            badge.textContent = `${totalIssues} ISSUES`;
+            badge.className = "badge-count";
+        }
+    }
+
+    function checkCompleteness() {
+        const { totalIssues, incompletePlants, missingFields } = getCompleteness();
+        if (totalIssues === 0) {
+            alert("🎉 SEMUA DATA LENGKAP! Morning & Evening sudah terisi.");
+        } else {
+            let msg = `⚠️ DATA BELUM LENGKAP!\nTotal issue: ${totalIssues}\nArea bermasalah: ${incompletePlants.length}\n\n`;
+            Object.keys(missingFields).forEach(name => {
+                msg += `📌 ${name}:\n`;
+                missingFields[name].forEach(issue => { msg += `   - ${issue}\n`; });
+                msg += "\n";
+            });
+            alert(msg);
+        }
+    }
+
+    // ============================================================
+    // RENDER MORNING
+    // ============================================================
+    function isPlantCompleteMorning(name) {
+        const d = plantDataMorning[name];
+        if (!d) return false;
+        if (!d.orderVolume || d.orderVolume.trim() === "") return false;
+        for (let f of morningCheckboxFields) {
+            if (d[f.key] === null) return false;
+        }
+        if (d.tmActual === false) {
+            if (!d.actualTm || d.actualTm.trim() === "") return false;
+            if (!d.reqPpc || d.reqPpc.trim() === "") return false;
+        }
+        if (d.sudahLoading === false) {
+            if (!d.keteranganLoading || d.keteranganLoading.trim() === "") return false;
+        }
+        for (let f of morningCheckboxFields) {
+            const key = f.key;
+            if ((f.triggerOn === 'x' && d[key] === false) || (f.triggerOn === 'ok' && d[key] === true)) {
+                if (!d[`kendala_${key}`] || d[`kendala_${key}`].trim() === "") return false;
+                if (!d[`action_${key}`] || d[`action_${key}`].trim() === "") return false;
+            }
+        }
+        return true;
+    }
+
+    function renderMorning() {
+        if (isRendering) return;
+        isRendering = true;
+        const container = document.getElementById("plantContainerMorning");
+        let html = "";
+        plantNames.forEach((name, idx) => {
+            const d = plantDataMorning[name];
+            const complete = isPlantCompleteMorning(name);
+            const cardClass = complete ? 'complete' : 'incomplete';
+
+            let filled = 0;
+            if (d.orderVolume && d.orderVolume.trim() !== "") filled++;
+            morningCheckboxFields.forEach(f => { if (d[f.key] !== null) filled++; });
+            if (d.tmActual === false) {
+                if (d.actualTm && d.actualTm.trim() !== "") filled++;
+                if (d.reqPpc && d.reqPpc.trim() !== "") filled++;
+            }
+            if (d.sudahLoading === false) {
+                if (d.keteranganLoading && d.keteranganLoading.trim() !== "") filled++;
+            }
+            for (let f of morningCheckboxFields) {
+                const key = f.key;
+                if ((f.triggerOn === 'x' && d[key] === false) || (f.triggerOn === 'ok' && d[key] === true)) {
+                    if (d[`kendala_${key}`] && d[`kendala_${key}`].trim() !== "") filled++;
+                    if (d[`action_${key}`] && d[`action_${key}`].trim() !== "") filled++;
+                }
+            }
+            const totalFields = 1 + morningCheckboxFields.length + 2 + 2 + (morningCheckboxFields.length * 2);
+            let statusClass = "empty", statusText = "Kosong";
+            const pct = (filled / totalFields) * 100;
+            if (pct >= 90) { statusClass = "complete"; statusText = "✓ Lengkap"; }
+            else if (pct >= 30) { statusClass = "partial"; statusText = "⏳ Sebagian"; }
+
+            html += `
+                <div class="plant-card ${cardClass}" data-plant="${name}" id="card-morning-${idx}">
+                    <div class="plant-header">
+                        <h2><span class="color-dot"></span>${idx+1}. Plant ${name} ${complete ? ' ✅' : ' ⏳'}</h2>
+                        <span class="plant-status ${statusClass}">${statusText} (${Math.round(pct)}%)</span>
+                    </div>
+                    <div class="row">
+                        <div class="field">
+                            <label>Order Volume Today</label>
+                            <input type="number" value="${d.orderVolume || ''}" placeholder="0" 
+                                oninput="updateMorningField('${name}', 'orderVolume', this.value)" min="0" step="1" />
+                        </div>
+            `;
+            morningCheckboxFields.forEach(f => {
+                const key = f.key;
+                const isOk = d[key] === true;
+                const isX = d[key] === false;
+                const checkedOk = isOk ? 'checked' : '';
+                const checkedX = isX ? 'checked' : '';
+                const showConstraint = (f.triggerOn === 'x' && isX) || (f.triggerOn === 'ok' && isOk);
+                const isTm = (key === 'tmActual');
+                const isLoading = (key === 'sudahLoading');
+                let labelOk = "OK", labelX = "X";
+                if (isTm) { labelOk = "Sesuai"; labelX = "Tidak Sesuai"; }
+                else if (isLoading) { labelOk = "Sudah Loading"; labelX = "Belum Loading"; }
+                else if (f.triggerOn === 'ok') { labelOk = "Ada"; labelX = "Tidak Ada"; }
+                else { labelOk = "Aman"; labelX = "Tidak Aman"; }
+
+                html += `
+                    <div class="field" style="grid-column:1/-1;${isLoading?'border-top:2px dashed #dce3ed;padding-top:12px;margin-top:8px;':''}">
+                        <label>${f.label}</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-ok">
+                                <input type="checkbox" ${checkedOk} onchange="toggleMorningCheckbox('${name}','${key}',true)" /> 
+                                <span class="checkbox-label-icon">✅</span> ${labelOk}
+                            </label>
+                            <label class="checkbox-x">
+                                <input type="checkbox" ${checkedX} onchange="toggleMorningCheckbox('${name}','${key}',false)" /> 
+                                <span class="checkbox-label-icon">❌</span> ${labelX}
+                            </label>
+                        </div>
+                    </div>
+                `;
+                if (isTm && isX) {
+                    html += `
+                        <div class="sub-fields show">
+                            <div class="sub-field-row"><label>📊 Actual TM:</label><input type="number" value="${d.actualTm||''}" placeholder="Actual TM" oninput="updateMorningField('${name}','actualTm',this.value)" min="0" step="1" /></div>
+                            <div class="sub-field-row"><label>📋 Req PPC:</label><input type="number" value="${d.reqPpc||''}" placeholder="Req PPC" oninput="updateMorningField('${name}','reqPpc',this.value)" min="0" step="1" /></div>
+                        </div>
+                    `;
+                }
+                if (isLoading && isX) {
+                    html += `
+                        <div class="sub-fields-loading show">
+                            <div class="sub-field-row-loading"><label>📝 Keterangan:</label><input type="text" value="${d.keteranganLoading||''}" placeholder="Keterangan" oninput="updateMorningField('${name}','keteranganLoading',this.value)" /></div>
+                        </div>
+                    `;
+                }
+                if (showConstraint) {
+                    html += `
+                        <div class="constraint-item show">
+                            <div class="constraint-title">⚠️ ${f.label} - Isi kendala & action:</div>
+                            <div class="constraint-row"><label>🚧 Kendala:</label><input type="text" value="${d[`kendala_${key}`]||''}" placeholder="Kendala" oninput="updateMorningField('${name}','kendala_${key}',this.value)" /></div>
+                            <div class="constraint-row"><label>✅ Action:</label><input type="text" value="${d[`action_${key}`]||''}" placeholder="Action" oninput="updateMorningField('${name}','action_${key}',this.value)" /></div>
+                        </div>
+                    `;
+                }
+            });
+            html += `</div></div>`;
+        });
+        container.innerHTML = html;
+        updateTotalDisplays();
+        updateNotification();
+        isRendering = false;
+    }
+
+    // ============================================================
+    // RENDER EVENING
+    // ============================================================
+    function isPlantCompleteEvening(name) {
+        const d = plantDataEvening[name];
+        if (!d) return false;
+        if (!d.volumeTomorrow || d.volumeTomorrow.trim() === "") return false;
+        if (!d.tmReqPpc || d.tmReqPpc.trim() === "") return false;
+        
+        for (let f of eveningCheckboxFields) {
+            if (d[f.key] === null) return false;
+        }
+        for (let f of eveningCheckboxFields) {
+            const key = f.key;
+            if ((f.triggerOn === 'x' && d[key] === false) || (f.triggerOn === 'ok' && d[key] === true)) {
+                if (!d[`kendala_${key}`] || d[`kendala_${key}`].trim() === "") return false;
+                if (!d[`action_${key}`] || d[`action_${key}`].trim() === "") return false;
+            }
+        }
+        return true;
+    }
+
+    function renderEvening() {
+        if (isRendering) return;
+        isRendering = true;
+        const container = document.getElementById("plantContainerEvening");
+        let html = "";
+        plantNames.forEach((name, idx) => {
+            const d = plantDataEvening[name];
+            const complete = isPlantCompleteEvening(name);
+            const cardClass = complete ? 'complete' : 'incomplete';
+
+            let filled = 0;
+            if (d.volumeTomorrow && d.volumeTomorrow.trim() !== "") filled++;
+            if (d.tmReqPpc && d.tmReqPpc.trim() !== "") filled++;
+            
+            eveningCheckboxFields.forEach(f => { if (d[f.key] !== null) filled++; });
+            for (let f of eveningCheckboxFields) {
+                const key = f.key;
+                if ((f.triggerOn === 'x' && d[key] === false) || (f.triggerOn === 'ok' && d[key] === true)) {
+                    if (d[`kendala_${key}`] && d[`kendala_${key}`].trim() !== "") filled++;
+                    if (d[`action_${key}`] && d[`action_${key}`].trim() !== "") filled++;
+                }
+            }
+            const totalFields = 1 + 1 + eveningCheckboxFields.length + (eveningCheckboxFields.length * 2);
+            let statusClass = "empty", statusText = "Kosong";
+            const pct = (filled / totalFields) * 100;
+            if (pct >= 90) { statusClass = "complete"; statusText = "✓ Lengkap"; }
+            else if (pct >= 30) { statusClass = "partial"; statusText = "⏳ Sebagian"; }
+
+            html += `
+                <div class="plant-card ${cardClass}" data-plant="${name}" id="card-evening-${idx}">
+                    <div class="plant-header">
+                        <h2><span class="color-dot"></span>${idx+1}. Plant ${name} ${complete ? ' ✅' : ' ⏳'}</h2>
+                        <span class="plant-status ${statusClass}">${statusText} (${Math.round(pct)}%)</span>
+                    </div>
+                    <div class="row">
+                        <div class="field">
+                            <label>Volume Tomorrow</label>
+                            <input type="number" value="${d.volumeTomorrow||''}" placeholder="0" 
+                                oninput="updateEveningField('${name}','volumeTomorrow',this.value)" min="0" step="1" />
+                        </div>
+                        
+                        <div class="tm-req-field">
+                            <label>📊 TM Req PPC</label>
+                            <input type="text" value="${d.tmReqPpc||''}" placeholder="Masukkan TM Req PPC..." 
+                                oninput="updateEveningField('${name}','tmReqPpc',this.value)" />
+                        </div>
+            `;
+            
+            eveningCheckboxFields.forEach(f => {
+                const key = f.key;
+                const isOk = d[key] === true;
+                const isX = d[key] === false;
+                const checkedOk = isOk ? 'checked' : '';
+                const checkedX = isX ? 'checked' : '';
+                const showConstraint = (f.triggerOn === 'x' && isX) || (f.triggerOn === 'ok' && isOk);
+                let labelOk = "OK", labelX = "X";
+                if (f.triggerOn === 'ok') { labelOk = "Ada"; labelX = "Tidak Ada"; }
+                else { labelOk = "Aman"; labelX = "Tidak Aman"; }
+
+                html += `
+                    <div class="field" style="grid-column:1/-1;">
+                        <label>${f.label}</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-ok">
+                                <input type="checkbox" ${checkedOk} onchange="toggleEveningCheckbox('${name}','${key}',true)" /> 
+                                <span class="checkbox-label-icon">✅</span> ${labelOk}
+                            </label>
+                            <label class="checkbox-x">
+                                <input type="checkbox" ${checkedX} onchange="toggleEveningCheckbox('${name}','${key}',false)" /> 
+                                <span class="checkbox-label-icon">❌</span> ${labelX}
+                            </label>
+                        </div>
+                    </div>
+                `;
+                if (showConstraint) {
+                    html += `
+                        <div class="constraint-item show">
+                            <div class="constraint-title">⚠️ ${f.label} - Isi kendala & action:</div>
+                            <div class="constraint-row"><label>🚧 Kendala:</label><input type="text" value="${d[`kendala_${key}`]||''}" placeholder="Kendala" oninput="updateEveningField('${name}','kendala_${key}',this.value)" /></div>
+                            <div class="constraint-row"><label>✅ Action:</label><input type="text" value="${d[`action_${key}`]||''}" placeholder="Action" oninput="updateEveningField('${name}','action_${key}',this.value)" /></div>
+                        </div>
+                    `;
+                }
+            });
+            html += `</div></div>`;
+        });
+        container.innerHTML = html;
+        updateTotalDisplays();
+        updateNotification();
+        isRendering = false;
+    }
+
+    // ============================================================
+    // UPDATE FUNCTIONS
+    // ============================================================
+    function updateMorningField(plant, key, value) {
+        if (plantDataMorning[plant]) {
+            plantDataMorning[plant][key] = value;
+            updateTotalDisplays();
+            updateNotification();
+            updateCardStatusMorning(plant);
+        }
+    }
+
+    function updateCardStatusMorning(plant) {
+        const complete = isPlantCompleteMorning(plant);
+        const cards = document.querySelectorAll('#plantContainerMorning .plant-card');
+        for (let card of cards) {
+            if (card.dataset.plant === plant) {
+                card.className = `plant-card ${complete ? 'complete' : 'incomplete'}`;
+                const statusEl = card.querySelector('.plant-status');
+                if (statusEl) {
+                    const d = plantDataMorning[plant];
+                    let filled = 0;
+                    if (d.orderVolume && d.orderVolume.trim() !== "") filled++;
+                    morningCheckboxFields.forEach(f => { if (d[f.key] !== null) filled++; });
+                    if (d.tmActual === false) {
+                        if (d.actualTm && d.actualTm.trim() !== "") filled++;
+                        if (d.reqPpc && d.reqPpc.trim() !== "") filled++;
+                    }
+                    if (d.sudahLoading === false) {
+                        if (d.keteranganLoading && d.keteranganLoading.trim() !== "") filled++;
+                    }
+                    for (let f of morningCheckboxFields) {
+                        const key = f.key;
+                        if ((f.triggerOn === 'x' && d[key] === false) || (f.triggerOn === 'ok' && d[key] === true)) {
+                            if (d[`kendala_${key}`] && d[`kendala_${key}`].trim() !== "") filled++;
+                            if (d[`action_${key}`] && d[`action_${key}`].trim() !== "") filled++;
+                        }
+                    }
+                    const totalFields = 1 + morningCheckboxFields.length + 2 + 2 + (morningCheckboxFields.length * 2);
+                    const pct = (filled / totalFields) * 100;
+                    let statusClass = "empty", statusText = "Kosong";
+                    if (pct >= 90) { statusClass = "complete"; statusText = "✓ Lengkap"; }
+                    else if (pct >= 30) { statusClass = "partial"; statusText = "⏳ Sebagian"; }
+                    statusEl.className = `plant-status ${statusClass}`;
+                    statusEl.textContent = `${statusText} (${Math.round(pct)}%)`;
+                }
+                const header = card.querySelector('.plant-header h2');
+                if (header) {
+                    header.innerHTML = header.innerHTML.replace(/ ✅| ⏳/, '') + (complete ? ' ✅' : ' ⏳');
+                }
+                break;
+            }
+        }
+    }
+
+    function toggleMorningCheckbox(plant, key, value) {
+        if (!plantDataMorning[plant]) return;
+        if (plantDataMorning[plant][key] === value) {
+            plantDataMorning[plant][key] = null;
+        } else {
+            plantDataMorning[plant][key] = value;
+        }
+        if (key === 'tmActual' && plantDataMorning[plant][key] !== false) {
+            plantDataMorning[plant].actualTm = "";
+            plantDataMorning[plant].reqPpc = "";
+        }
+        if (key === 'sudahLoading' && plantDataMorning[plant][key] !== false) {
+            plantDataMorning[plant].keteranganLoading = "";
+        }
+        renderMorning();
+        if (activeTab === 'evening') renderEvening();
+        updateTotalDisplays();
+        updateNotification();
+    }
+
+    function updateEveningField(plant, key, value) {
+        if (plantDataEvening[plant]) {
+            plantDataEvening[plant][key] = value;
+            updateTotalDisplays();
+            updateNotification();
+            updateCardStatusEvening(plant);
+        }
+    }
+
+    function updateCardStatusEvening(plant) {
+        const complete = isPlantCompleteEvening(plant);
+        const cards = document.querySelectorAll('#plantContainerEvening .plant-card');
+        for (let card of cards) {
+            if (card.dataset.plant === plant) {
+                card.className = `plant-card ${complete ? 'complete' : 'incomplete'}`;
+                const statusEl = card.querySelector('.plant-status');
+                if (statusEl) {
+                    const d = plantDataEvening[plant];
+                    let filled = 0;
+                    if (d.volumeTomorrow && d.volumeTomorrow.trim() !== "") filled++;
+                    if (d.tmReqPpc && d.tmReqPpc.trim() !== "") filled++;
+                    eveningCheckboxFields.forEach(f => { if (d[f.key] !== null) filled++; });
+                    for (let f of eveningCheckboxFields) {
+                        const key = f.key;
+                        if ((f.triggerOn === 'x' && d[key] === false) || (f.triggerOn === 'ok' && d[key] === true)) {
+                            if (d[`kendala_${key}`] && d[`kendala_${key}`].trim() !== "") filled++;
+                            if (d[`action_${key}`] && d[`action_${key}`].trim() !== "") filled++;
+                        }
+                    }
+                    const totalFields = 1 + 1 + eveningCheckboxFields.length + (eveningCheckboxFields.length * 2);
+                    const pct = (filled / totalFields) * 100;
+                    let statusClass = "empty", statusText = "Kosong";
+                    if (pct >= 90) { statusClass = "complete"; statusText = "✓ Lengkap"; }
+                    else if (pct >= 30) { statusClass = "partial"; statusText = "⏳ Sebagian"; }
+                    statusEl.className = `plant-status ${statusClass}`;
+                    statusEl.textContent = `${statusText} (${Math.round(pct)}%)`;
+                }
+                const header = card.querySelector('.plant-header h2');
+                if (header) {
+                    header.innerHTML = header.innerHTML.replace(/ ✅| ⏳/, '') + (complete ? ' ✅' : ' ⏳');
+                }
+                break;
+            }
+        }
+    }
+
+    function toggleEveningCheckbox(plant, key, value) {
+        if (!plantDataEvening[plant]) return;
+        if (plantDataEvening[plant][key] === value) {
+            plantDataEvening[plant][key] = null;
+        } else {
+            plantDataEvening[plant][key] = value;
+        }
+        renderEvening();
+        if (activeTab === 'morning') renderMorning();
+        updateTotalDisplays();
+        updateNotification();
+    }
+
+    // ============================================================
+    // DATE FUNCTIONS
+    // ============================================================
+    function getCurrentDate() {
+        const dateInput = document.getElementById("filterDate");
+        if (!dateInput.value) {
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.value = today;
+        }
+        return dateInput.value;
+    }
+
+    function saveByDate() {
+        if (!isStorageAvailable) {
+            alert("⚠️ Penyimpanan tidak tersedia. Gunakan Export JSON untuk backup.");
+            return;
+        }
+        const date = getCurrentDate();
+        const storageKey = `eastBU_${date}`;
+        calculateTotalMorning();
+        calculateTotalEvening();
+        const dataToSave = {
+            morning: plantDataMorning,
+            evening: plantDataEvening,
+            totalOrderMorning: totalOrderMorning,
+            totalOrderEvening: totalOrderEvening
+        };
+        try {
+            localStorage.setItem(storageKey, JSON.stringify(dataToSave));
+            localStorage.setItem("eastBU_lastDate", date);
+            updateStatusIndicator(date, true);
+            alert(`✅ Data untuk tanggal ${date} berhasil disimpan!`);
+        } catch(e) {
+            alert("❌ Gagal menyimpan: " + e.message);
+        }
+    }
+
+    function loadByDate() {
+        if (!isStorageAvailable) {
+            alert("⚠️ Penyimpanan tidak tersedia. Gunakan Import JSON untuk memuat data.");
+            return;
+        }
+        isLoading = true;
+        const date = getCurrentDate();
+        const storageKey = `eastBU_${date}`;
+        try {
+            const raw = localStorage.getItem(storageKey);
+            if (!raw) {
+                initMorningData(); initEveningData();
+                renderMorning(); renderEvening();
+                updateStatusIndicator(date, false);
+                isLoading = false;
+                return;
+            }
+            const saved = JSON.parse(raw);
+            if (saved.morning) {
+                plantNames.forEach(name => {
+                    if (!saved.morning[name]) return;
+                    Object.keys(saved.morning[name]).forEach(key => {
+                        if (plantDataMorning[name] && plantDataMorning[name][key] !== undefined) {
+                            plantDataMorning[name][key] = saved.morning[name][key];
+                        }
+                    });
+                });
+            }
+            if (saved.evening) {
+                plantNames.forEach(name => {
+                    if (!saved.evening[name]) return;
+                    Object.keys(saved.evening[name]).forEach(key => {
+                        if (plantDataEvening[name] && plantDataEvening[name][key] !== undefined) {
+                            plantDataEvening[name][key] = saved.evening[name][key];
+                        }
+                    });
+                });
+            }
+            if (saved.totalOrderMorning !== undefined) totalOrderMorning = saved.totalOrderMorning;
+            if (saved.totalOrderEvening !== undefined) totalOrderEvening = saved.totalOrderEvening;
+            renderMorning(); renderEvening();
+            updateStatusIndicator(date, true);
+            isLoading = false;
+        } catch(e) {
+            alert("❌ Gagal memuat: " + e.message);
+            isLoading = false;
+        }
+    }
+
+    function deleteByDate() {
+        if (!isStorageAvailable) return;
+        const date = getCurrentDate();
+        if (!confirm(`⚠️ Hapus semua data untuk ${date}?`)) return;
+        try {
+            localStorage.removeItem(`eastBU_${date}`);
+            initMorningData(); initEveningData();
+            renderMorning(); renderEvening();
+            updateStatusIndicator(date, false);
+            alert(`🗑️ Data ${date} dihapus.`);
+        } catch(e) { alert("❌ Gagal: " + e.message); }
+    }
+
+    // ============================================================
+    // JSON EXPORT / IMPORT
+    // ============================================================
+    function exportJSON() {
+        const date = getCurrentDate();
+        calculateTotalMorning(); calculateTotalEvening();
+        const data = {
+            date, exportedAt: new Date().toISOString(),
+            morning: plantDataMorning, evening: plantDataEvening,
+            totalOrderMorning, totalOrderEvening
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `Checklist_EastBU_${date}.json`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        alert("✅ JSON berhasil diexport!");
+    }
+
+    function importJSON(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (!data.morning || !data.evening) { alert("❌ Format file tidak valid!"); return; }
+                plantNames.forEach(name => {
+                    if (data.morning[name]) {
+                        Object.keys(data.morning[name]).forEach(key => {
+                            if (plantDataMorning[name] && plantDataMorning[name][key] !== undefined)
+                                plantDataMorning[name][key] = data.morning[name][key];
+                        });
+                    }
+                    if (data.evening[name]) {
+                        Object.keys(data.evening[name]).forEach(key => {
+                            if (plantDataEvening[name] && plantDataEvening[name][key] !== undefined)
+                                plantDataEvening[name][key] = data.evening[name][key];
+                        });
+                    }
+                });
+                if (data.totalOrderMorning !== undefined) totalOrderMorning = data.totalOrderMorning;
+                if (data.totalOrderEvening !== undefined) totalOrderEvening = data.totalOrderEvening;
+                if (data.date) document.getElementById("filterDate").value = data.date;
+                renderMorning(); renderEvening();
+                alert(`✅ Data berhasil diimport!`);
+                if (isStorageAvailable) saveByDate();
+            } catch(err) { alert("❌ Gagal: " + err.message); }
+        };
+        reader.readAsText(file);
+        event.target.value = '';
+    }
+
+    // ============================================================
+    // EXPORT SUMMARY - TAMPILKAN SEMUA STATUS SEPERTI DI APLIKASI
+    // ============================================================
+    function exportData() {
+        const date = getCurrentDate();
+        calculateTotalMorning();
+        calculateTotalEvening();
+        
+        let text = `📋 EAST BU CHECKLIST – ${date}\n`;
+        text += "=".repeat(60) + "\n";
+        
+        if (activeTab === 'morning') {
+            text += `🌅 MORNING CHECKLIST\n`;
+            text += `📊 TOTAL ORDER: ${totalOrderMorning.toLocaleString('id-ID')}\n`;
+            text += "=".repeat(60) + "\n\n";
+            
+            plantNames.forEach((name) => {
+                const d = plantDataMorning[name];
+                const complete = isPlantCompleteMorning(name);
+                text += `*${name.toUpperCase()}* ${complete ? '✅' : '⏳'}\n`;
+                
+                let no = 1;
+                // Order Volume
+                text += `   ${no}. Order Volume Today: ${d.orderVolume || "(kosong)"}\n`;
+                no++;
+                
+                // Semua checkbox fields
+                morningCheckboxFields.forEach(f => {
+                    const key = f.key;
+                    const val = d[key];
+                    
+                    // Status checkbox
+                    let statusDisplay = "";
+                    if (val === null) {
+                        statusDisplay = "[ ] Belum dipilih";
+                    } else if (val === true) {
+                        if (f.triggerOn === 'ok') {
+                            statusDisplay = "✅ Ada";
+                        } else if (key === 'tmActual') {
+                            statusDisplay = "✅ Sesuai";
+                        } else if (key === 'sudahLoading') {
+                            statusDisplay = "✅ Sudah Loading";
+                        } else {
+                            statusDisplay = "✅ Aman";
+                        }
+                    } else {
+                        if (f.triggerOn === 'ok') {
+                            statusDisplay = "❌ Tidak Ada";
+                        } else if (key === 'tmActual') {
+                            statusDisplay = "❌ Tidak Sesuai";
+                        } else if (key === 'sudahLoading') {
+                            statusDisplay = "❌ Belum Loading";
+                        } else {
+                            statusDisplay = "❌ Tidak Aman";
+                        }
+                    }
+                    
+                    text += `   ${no}. ${f.label}: ${statusDisplay}\n`;
+                    no++;
+                    
+                    // Sub fields untuk TM Actual
+                    if (key === 'tmActual' && val === false) {
+                        text += `      Actual TM: ${d.actualTm || "-"}\n`;
+                        text += `      Req PPC: ${d.reqPpc || "-"}\n";
+                    }
+                    
+                    // Sub fields untuk Sudah Loading
+                    if (key === 'sudahLoading' && val === false) {
+                        text += `      Keterangan: ${d.keteranganLoading || "-"}\n`;
+                    }
+                    
+                    // Constraint (Kendala & Action)
+                    if ((f.triggerOn === 'x' && val === false) || (f.triggerOn === 'ok' && val === true)) {
+                        text += `      *Kendala: ${d[`kendala_${key}`] || "-"}*\n`;
+                        text += `      *Action: ${d[`action_${key}`] || "-"}*\n`;
+                    }
+                });
+                text += "\n";
+            });
+        } else {
+            text += `🌆 EVENING CHECKLIST\n`;
+            text += `📊 TOTAL ORDER: ${totalOrderEvening.toLocaleString('id-ID')}\n`;
+            text += "=".repeat(60) + "\n\n";
+            
+            plantNames.forEach((name) => {
+                const d = plantDataEvening[name];
+                const complete = isPlantCompleteEvening(name);
+                text += `*${name.toUpperCase()}* ${complete ? '✅' : '⏳'}\n`;
+                
+                let no = 1;
+                text += `   ${no}. Volume Tomorrow: ${d.volumeTomorrow || "(kosong)"}\n`;
+                no++;
+                text += `   ${no}. TM Req PPC: ${d.tmReqPpc || "(kosong)"}\n`;
+                no++;
+                
+                eveningCheckboxFields.forEach(f => {
+                    const key = f.key;
+                    const val = d[key];
+                    
+                    let statusDisplay = "";
+                    if (val === null) {
+                        statusDisplay = "[ ] Belum dipilih";
+                    } else if (val === true) {
+                        if (f.triggerOn === 'ok') {
+                            statusDisplay = "✅ Ada";
+                        } else {
+                            statusDisplay = "✅ Aman";
+                        }
+                    } else {
+                        if (f.triggerOn === 'ok') {
+                            statusDisplay = "❌ Tidak Ada";
+                        } else {
+                            statusDisplay = "❌ Tidak Aman";
+                        }
+                    }
+                    
+                    text += `   ${no}. ${f.label}: ${statusDisplay}\n`;
+                    no++;
+                    
+                    if ((f.triggerOn === 'x' && val === false) || (f.triggerOn === 'ok' && val === true)) {
+                        text += `      *Kendala: ${d[`kendala_${key}`] || "-"}*\n`;
+                        text += `      *Action: ${d[`action_${key}`] || "-"}*\n`;
+                    }
+                });
+                text += "\n";
+            });
+        }
+
+        text += "=".repeat(60) + "\n";
+        text += `📅 ${new Date().toLocaleString()}\n`;
+        
+        const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `Checklist_EastBU_${date}_${activeTab}.txt`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    // ============================================================
+    // EXPORT EXCEL
+    // ============================================================
+    function exportExcel() {
+        const date = getCurrentDate();
+        calculateTotalMorning();
+        calculateTotalEvening();
+        let csv = "\uFEFF";
+        
+        if (activeTab === 'morning') {
+            let headers = ['No', 'Plant', 'Order Volume'];
+            morningCheckboxFields.forEach(f => {
+                headers.push(f.label);
+                if (f.key === 'tmActual') {
+                    headers.push('Actual TM', 'Req PPC');
+                }
+                if (f.key === 'sudahLoading') {
+                    headers.push('Keterangan Loading');
+                }
+                headers.push(`Kendala ${f.label}`, `Action ${f.label}`);
+            });
+            headers.push('Status');
+            csv += headers.map(h => `"${h}"`).join(',') + '\n';
+            
+            plantNames.forEach((name, idx) => {
+                const d = plantDataMorning[name];
+                const complete = isPlantCompleteMorning(name) ? 'COMPLETE' : 'INCOMPLETE';
+                let row = [(idx+1), name.toUpperCase(), d.orderVolume || ''];
+                morningCheckboxFields.forEach(f => {
+                    const key = f.key;
+                    const val = d[key];
+                    let status = '';
+                    if (val === null) status = 'Belum dipilih';
+                    else if (val === true) {
+                        if (f.triggerOn === 'ok') status = 'Ada';
+                        else status = f.key === 'tmActual' ? 'Sesuai' : f.key === 'sudahLoading' ? 'Sudah Loading' : 'Aman';
+                    } else {
+                        if (f.triggerOn === 'x') status = f.key === 'tmActual' ? 'Tidak Sesuai' : f.key === 'sudahLoading' ? 'Belum Loading' : 'Tidak Aman';
+                        else status = 'Tidak Ada';
+                    }
+                    row.push(status);
+                    if (key === 'tmActual') {
+                        row.push(val === false ? (d.actualTm || '') : '');
+                        row.push(val === false ? (d.reqPpc || '') : '');
+                    }
+                    if (key === 'sudahLoading') {
+                        row.push(val === false ? (d.keteranganLoading || '') : '');
+                    }
+                    const showConstraint = (f.triggerOn === 'x' && val === false) || (f.triggerOn === 'ok' && val === true);
+                    row.push(showConstraint ? (d[`kendala_${key}`] || '') : '');
+                    row.push(showConstraint ? (d[`action_${key}`] || '') : '');
+                });
+                row.push(complete);
+                csv += row.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',') + '\n';
+            });
+            csv += `\n"TOTAL ORDER","${totalOrderMorning.toLocaleString('id-ID')}"\n`;
+            
+        } else {
+            let headers = ['No', 'Plant', 'Volume Tomorrow', 'TM Req PPC'];
+            eveningCheckboxFields.forEach(f => {
+                headers.push(f.label);
+                headers.push(`Kendala ${f.label}`, `Action ${f.label}`);
+            });
+            headers.push('Status');
+            csv += headers.map(h => `"${h}"`).join(',') + '\n';
+            
+            plantNames.forEach((name, idx) => {
+                const d = plantDataEvening[name];
+                const complete = isPlantCompleteEvening(name) ? 'COMPLETE' : 'INCOMPLETE';
+                let row = [
+                    (idx+1),
+                    name.toUpperCase(),
+                    d.volumeTomorrow || '',
+                    d.tmReqPpc || ''
+                ];
+                eveningCheckboxFields.forEach(f => {
+                    const key = f.key;
+                    const val = d[key];
+                    let status = '';
+                    if (val === null) status = 'Belum dipilih';
+                    else if (val === true) {
+                        if (f.triggerOn === 'ok') status = 'Ada';
+                        else status = 'Aman';
+                    } else {
+                        if (f.triggerOn === 'x') status = 'Tidak Aman';
+                        else status = 'Tidak Ada';
+                    }
+                    row.push(status);
+                    const showConstraint = (f.triggerOn === 'x' && val === false) || (f.triggerOn === 'ok' && val === true);
+                    row.push(showConstraint ? (d[`kendala_${key}`] || '') : '');
+                    row.push(showConstraint ? (d[`action_${key}`] || '') : '');
+                });
+                row.push(complete);
+                csv += row.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',') + '\n';
+            });
+            csv += `\n"TOTAL ORDER","${totalOrderEvening.toLocaleString('id-ID')}"\n`;
+        }
+
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `Checklist_EastBU_${date}_${activeTab}.csv`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+
+    // ============================================================
+    // RESET
+    // ============================================================
+    function resetAll() {
+        if (!confirm("⚠️ Reset semua data yang sedang diisi?")) return;
+        initMorningData(); initEveningData();
+        renderMorning(); renderEvening();
+        const date = getCurrentDate();
+        updateStatusIndicator(date, false);
+        alert("🔄 Data direset.");
+    }
+
+    // ============================================================
+    // AUTO LOAD
+    // ============================================================
+    window.onload = function() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById("filterDate").value = today;
+        if (isStorageAvailable) {
+            const lastDate = localStorage.getItem("eastBU_lastDate");
+            if (lastDate) document.getElementById("filterDate").value = lastDate;
+            loadByDate();
+        } else {
+            renderMorning(); renderEvening();
+            const date = getCurrentDate();
+            updateStatusIndicator(date, false);
+        }
+        renderMorning();
+    };
+</script>
+
+</body>
+</html>
